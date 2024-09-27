@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NBA Stints stats</title>
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+
+  
+</head>
+
+<body>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+function FilterByGame()
+    {
+       //taskCategory_list
+       var category = document.getElementById("id_category");
+       alert(category);
+       //var sTaskPos = category.options["selectedIndex"];
+       //alert(sTaskPos.value);
+       var post_request = $.get("/stats/Game/",
+         {"task_cat":category.value,csrfmiddlewaretoken:"{{ csrf_token }}"},function(data) {
+             alert(data)
+           })
+       
+        
+     }
+    // function byGameId(){
+      
+    //    $.ajax({
+    //      type: 'GET',
+    //      url: "/stats/Game/",
+    //      data: {
+    //       category: $("#id_category").val(),
+    //      },
+    //      dataType: 'json',
+    //      success: function(response) {
+    //        alert(response);
+    //      }
+
+    //    })
+    // }
+  
+     </script>
+  <main class="container">
+    <section style="margin-bottom: 0.5rem;">
+      <hgroup><h2>NBA Stints Stats</h2>
+       
+    </section>
+    <form name="NewProgramForm" id="NewProgramForm" onchange="FilterByGame()">{% csrf_token %}
+			<select name="category" id="id_category">
+			<option value="" selected="selected">Game</option>
+				<option value="202306010">202306010</option>
+				<option value="202306030">202306030</option>
+			</select>
+		</form>
+    <!-- <div class="grid">
+      <canvas id="myChart_avg_lvl" width="100%"></canvas>
+    </div> -->
+  </main>
+ 
+  <script>
+ 
+  
+  </script>
+
+</body>
+
+</html>

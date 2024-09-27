@@ -1,0 +1,25 @@
+/* Custom styles for the navbar */
+.navbar-custom {
+    background-color: #1abc9c; /* Teal color */
+    color: white; /* White text for contrast */
+}
+
+.navbar-custom .nav-link {
+    font-family: 'Roboto', sans-serif; /* Change to the chosen Google Font */
+    font-size: 16px;
+}
+
+/* Define a custom class for the navbar links */
+.custom-nav-link {
+    color: #ffffff; /* Your desired default color */
+    text-decoration: none; /* Removes underline */
+}
+
+/* Hover state */
+.custom-nav-link:hover {
+    color: #ecf0f1; /* Color when hovered */
+    font: ariel;
+}
+.navbar {
+    font-family: 'Roboto', sans-serif;
+}
