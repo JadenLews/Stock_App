@@ -42,3 +42,35 @@ def watchlist(request):
 
 def notifications(request):
     return render(request, "pages/notifications.html")
+
+from django.shortcuts import render
+
+def stock_search(request):
+    query = request.GET.get('query', '')  # Capture the query parameter from the URL
+    # Do something with the query, like searching a database
+    context = {'query': query}
+    return render(request, 'pages/stock_search.html', context)
+
+
+def watchlist(request):
+    return render(request, "pages/watchlist.html")
+
+def notifications(request):
+    return render(request, "pages/notifications.html")
+
+def portfolio(request):
+    return render(request, "pages/portfolio.html")
+
+def watchlist(request):
+    return render(request, "pages/watchlist.html")
+
+def notifications(request):
+    return render(request, "pages/notifications.html")
+
+from django.shortcuts import render
+
+def stock_search(request):
+    query = request.GET.get('query', '')  # Capture the query parameter from the URL
+    # Do something with the query, like searching a database
+    context = {'query': query}
+    return render(request, 'pages/stock_search.html', context)
