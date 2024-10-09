@@ -31,6 +31,7 @@ def register(request):
     return render(request, 'pages/register.html', context)
 
 
+
 def home(request):
     return render(request, "pages/home.html")
 
