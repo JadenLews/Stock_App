@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<style>
+    .charts-container {
+        display: flex; /* Use flexbox for layout */
+        justify-content: space-between; /* Distribute space between columns */
+    }
+
+    .left-column, .right-column {
+        width: 48%; /* Set the width for the columns */
+    }
+
+    h5 {
+        margin: 10px 0; /* Add some margin for spacing */
+    }
+</style>
+
+<div class="portfoliopage">
+    {% if user.is_authenticated %}
+    <h3>Summary</h3>
+    <div class="charts-container">
+        <div class="left-column">
+            <h5>Total Value Chart goes here</h5>
+            <h5>Position Chart goes here</h5>
+        </div>
+        <div class="right-column">
+            <h5>Watchlist Chart goes here</h5>
+            <h5>Markets Chart goes here</h5>
+        </div>
+    </div>
+    {% else %}
+    <h3>Sorry buddy! To see the portfolio, you must log in!</h3>
+    {% endif %}
+</div>
+{% endblock %}

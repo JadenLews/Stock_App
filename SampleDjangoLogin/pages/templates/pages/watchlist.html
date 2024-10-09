@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<style>
+    .charts-container {
+        display: flex; /* Use flexbox for layout */
+        justify-content: space-between; /* Distribute space between columns */
+    }
+
+    .left-column, .right-column {
+        width: 48%; /* Set the width for the columns */
+    }
+
+    h5 {
+        margin: 10px 0; /* Add some margin for spacing */
+    }
+</style>
+
+<div class="watchlistpage">
+    {% if user.is_authenticated %}
+    <div class="charts-container">
+        <div class="left-column">
+            <h3>My Watchlist</h3>
+            <h5>Watchlist Chart goes here</h5>
+        </div>
+        <div class="right-column">
+            <h5>Company Name goes here</h5>
+            <h5>Company graph goes here</h5>
+            <h5>Company chart goes here</h5>
+        </div>
+    </div>
+    {% else %}
+    <h3>Sorry buddy! To see the watchlist, you must log in!</h3>
+    {% endif %}
+</div>
+{% endblock %}

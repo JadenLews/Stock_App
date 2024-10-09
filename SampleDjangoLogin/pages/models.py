@@ -1,31 +1,6 @@
 from django.db import models
 import uuid
 
-# Create your models here.
-class Project(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    technology = models.CharField(max_length=20)
-
-class Student(models.Model):
-    name = models.CharField(max_length=30)
-    age = models.IntegerField()
-    major = models.CharField(max_length=10)
-    graduated = models.BooleanField()
-
-class gameStints(models.Model):
-    gameID = models.CharField(max_length=10) 
-    stintStart = models.CharField(max_length=10)  
-    stintEnd = models.CharField(max_length=10)  
-    awayPos = models.IntegerField() 
-    homePos = models.IntegerField() 
-    awayScore = models.IntegerField() 
-    homeScore = models.IntegerField() 
-
-
-
-
-
 class Account(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
