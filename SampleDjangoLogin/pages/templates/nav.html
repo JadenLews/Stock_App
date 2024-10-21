@@ -1,11 +1,26 @@
 <style>
+
+    .navbar-custom {
+        background-color: #202020;
+        border-radius: 5px !important;
+        padding: 10px;
+        border: .5px solid #000000 !important;
+    }
     /* Base style for the search bar */
     .search-bar {
         width: 100%;
         max-width: 400px; /* Default max width */
         margin-right: 10px;
     }
-
+    .notification-text {
+        color: #FFFFFF !important;
+    }
+    .nav-item {
+        font-size: 18px;
+    }
+    .container-fluid {
+        border-radius: 5px !important;
+    }
     .navbar .nav-item .nav-link.active {
     color: #30A900 !important;
 }
@@ -73,14 +88,16 @@
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-custom w-100" style="font-family: 'IBM Plex Sans', sans-serif; font-weight: 400;">
+    <div class="baktop"></div>
     <div class="container-fluid px-0">
         <!-- Flex container for the search bar and notifications link -->
         <div class="d-flex align-items-center w-100">
             <!-- Group search bar and notifications to keep them together -->
             <div class="d-flex flex-grow-1 align-items-center">
                 <!-- Search bar -->
-                <form class="d-flex" action="/pages/search-results/" method="GET" style="margin-right: 10px;">
-                    <input class="form-control search-bar" type="search" name="query" placeholder="Search Stocks" aria-label="Search">
+                <form class="d-flex" action="{% url 'stock_details' %}" method="POST" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input class="form-control search-bar" type="text" name="stock_symbol" placeholder="Search for a stock" aria-label="Search">
                 </form>
 
                 <!-- Notifications link always next to search bar with responsive text and bell icon -->
@@ -122,13 +139,13 @@
             <!-- Left-aligned links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="/pages/home/" class="nav-link {% if request.path == '/pages/home/' %}active{% endif %}" style="margin-right: 20px; color: #000000; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Dashboard</a>
+                    <a href="/pages/home/" class="nav-link {% if request.path == '/pages/home/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/pages/portfolio/" class="nav-link {% if request.path == '/pages/portfolio/' %}active{% endif %}" style="margin-right: 20px; color: #000000; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Portfolio</a>
+                    <a href="/pages/portfolio/" class="nav-link {% if request.path == '/pages/portfolio/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Portfolio</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/pages/watchlist/" class="nav-link {% if request.path == '/pages/watchlist/' %}active{% endif %}" style="margin-right: 20px; color: #000000; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Watchlist</a>
+                    <a href="/pages/watchlist/" class="nav-link {% if request.path == '/pages/watchlist/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Watchlist</a>
                 </li>
             </ul>
         </div>
