@@ -43,3 +43,25 @@ class Watchlist(models.Model):
     
     class Meta:
         unique_together = ('stock', 'user')
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('stock', 'Stock'),
+        ('system', 'System'),
+    ]
+
+    STATUS_CHOICES = [
+        ('unviewed', 'Unviewed'),
+        ('viewed', 'Viewed'),
+    ]
+
+    message = models.TextField()  # Notification message
+    n_type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES, default='system')  # Type of notification
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')  # User receiving the notification
+    stock = models.ForeignKey('Stock', null=True, blank=True, on_delete=models.CASCADE, related_name='notifications')  # Stock related to the notification, nullable for system notifications
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unviewed')  # Status of the notification
+
+    created_at = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
+
+    def __str__(self):
+        return f'{self.n_type.capitalize()} Notification for {self.who.username} - {self.status.capitalize()}'

@@ -1,139 +1,23 @@
-<style>
-.container {
-    background-color: #464646;
-}
-
-.cardtop {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 24px;
-    color: #ffffff !important;
-    text-align: center;
-    font-weight: 600;
-}
-.card {
-    width: 350px;
-    float: right;
-}
-.card-body {
-    padding-top: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-}
-.quantity input {
-    width: 80px;
-    transition: width 0.2s ease;
-    min-width: 80px;
-    max-width: 100%;
-}
-.stock-display2 {
-    font-size: 12px;
-    color: #ffffff !important;
-    font-weight: 600;
-}
-
-.form-label, .labelcurrent, .stock-display {
-    color: #ffffff !important;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.total_price input {
-    width: 150px;
-    min-width: 150px;
-    max-width: 300px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.stock-display {
-    border: none;
-    background-color: transparent;
-}
-
-.buy_sell {
-    max-width: 400px;
-    background-color: #202020 !important;
-}
-
-.action-container {
-    display: flex;
-    gap: 20px;
-}
-
-.action-item {
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: all 0.3s ease;
-}
-
-.action-item.buy {
-    color: green;
-}
-
-.action-item.sell {
-    color: red;
-}
-
-.active-action {
-    font-size: 1.5rem;
-    font-weight: bold;
-    transform: scale(1.1);
-}
-
-.section-divider {
-    border-top: 1px solid #ccc;
-    margin: 10px 0;
-}
-
-.custom-btn {
-    width: 150px !important;
-    background-color: #4CAF50 !important;
-    color: white !important;
-    border: none !important;
-    padding: 10px 20px !important;
-    text-align: center !important;
-    font-size: 16px !important;
-    border-radius: 5px !important;
-    display: block !important;
-    margin: 0 auto !important;
-    cursor: pointer !important;
-    font-family: 'IBM Plex Sans', sans-serif !important;
-    font-weight: 400 !important;
-}
-
-.custom-btn:hover {
-    background-color: #45a049 !important; /* Change color on hover */
-}
-</style>
-
 {% extends "base.html" %}
 {% block page_content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/stock_details.css' %}">
 <div class="search_results">
-    <div class="baktop"></div>
     {% if error %}
         <div class="alert alert-danger" role="alert">{{ error }}</div>
     {% else %}
         <div class="card mb-4 buy_sell">
+            <div class="card-header">
+                <span id="buyAction" class="action-item buy">Buy</span>
+                <span id="sellAction" class="action-item sell">Sell</span>
+              </div>
             <div class="card-body">
-                <div class="cardtop">Buy/Sell</div>
-                <hr class="section-divider">
                 <!-- Stock symbol and price -->
-                <div class="mb-3 stock_symbol d-flex flex-column justify-content-center align-items-center">
-                    <label for="stockSymbol" class="form-label ">Stock</label>
-                    <h1 class="stock-display2">{{ stock.company_name }}</h1>
+                <div class="stock_symbol d-flex flex-column justify-content-center align-items-center">
+                    <h1 class="stock-display stockticker">{{ stock.symbol| upper }}</h1>
+                    <label class="labelcurrent stockdisplay2" for="currentPrice">Market Price:</label>
+                    <h1 class="stock-display stockdisplay2">${{ stock.price|floatformat:2}}</h1>
                 </div>
-
-                <hr class="section-divider">
-
-                <div class="mb-3 stock_price d-flex flex-column justify-content-center align-items-center">
-                    <label class="labelcurrent" for="currentPrice">Current Price:</label>
-                    <h1 class="stock-display">${{ stock.price|floatformat:2}}</h1>
-                </div>
-
-                <hr class="section-divider">
 
                 <form method="POST" action="{% url 'execute_trade' %}">
                     {% csrf_token %}
@@ -141,25 +25,15 @@
                     <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
                     <!-- Action (Buy/Sell) Hidden Input -->
                     <input type="hidden" name="trade_action" id="tradeAction" value="buy"> <!-- Default to buy -->
-                <!-- Action (Buy/Sell) -->
-                <div class="mb-3 d-flex flex-column justify-content-center align-items-center">
-                    <label for="action" class="form-label">Action</label>
-                    <div>
-                        <span id="buyAction" class="action-item buy">Buy</span>
-                        <span id="sellAction" class="action-item sell">Sell</span>
-                    </div>
-                </div>
             
                 <!-- Quantity Input -->
-                <div class="mb-3 quantity d-flex flex-column justify-content-center align-items-center">
-                    <label for="quantity" class="form-label">Quantity:</label>
+                <div class="quantity d-flex flex-column justify-content-center align-items-center">
+                    <label for="quantity" class="form-label">Shares:</label>
                     <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1">
                 </div>
 
-                <hr class="section-divider">
-
                 <!-- Total Price -->
-                <div class="mb-3 total_price d-flex flex-column justify-content-center align-items-center">
+                <div class="total_price d-flex flex-column justify-content-center align-items-center">
                     <label class="labelcurrent" for="totalPrice">Total Price:</label>
                     <input type="text" class="stock-display" id="totalPrice" value="${{stock.price|floatformat:2}}" readonly>
                 </div>
@@ -198,10 +72,8 @@
     }
                 </script>
 
-                <hr class="section-divider">
-
                 <!-- Execute Trade Button -->
-                <button type="submit" class="btn custom-btn">Execute Trade</button>
+                <button type="submit" class="custom-btn">Execute Trade</button>
             </form>
             </div>
         </div>

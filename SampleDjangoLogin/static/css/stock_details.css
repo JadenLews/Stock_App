@@ -1,0 +1,114 @@
+.search_results {
+    margin: 20px;
+}
+.backyground {
+    background-color: #464646;
+}
+.total_price, .stock_symbol {
+    padding: 10px;
+    border-bottom: 1px solid #777777;
+}
+
+.card-header {
+    display: flex;
+    justify-content: center; /* Centers the content horizontally */
+    align-items: center; /* Centers the content vertically (if necessary) */
+    border-bottom: 2px solid #777777;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.buysell_Header, .stockdisplay2 {
+    color: #ffffff;
+}
+
+.cardtop {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 24px;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 600;
+}
+.card {
+    width: 300px;
+    float: right;
+}
+.card-body {
+    padding: 0 !important;
+
+}
+.quantity input {
+    width: 80px;
+    transition: width 0.2s ease;
+    min-width: 80px;
+}
+
+.form-label, .labelcurrent {
+    color: #ffffff !important;
+    font-size: 18px;
+    font-weight: 600;
+}
+.stock-display {
+    font-size: 18px;
+    font-weight: 600;
+}
+.stockticker {
+    color: #464646;
+}
+
+.total_price input {
+    min-width: 150px;
+    max-width: 300px;
+    width: 150px;
+    max-width: 300px;
+    text-align: center;
+}
+
+.buy_sell {
+    max-width: 400px;
+    background-color: #202020 !important;
+}
+
+.action-item {
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+
+.action-item.buy {
+    color: green;
+}
+
+.action-item.sell {
+    color: red;
+}
+
+.active-action {
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: scale(1.1);
+}
+
+.custom-btn {
+    width: 150px;
+    background-color: #30A900;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 15px auto; /* Center the button with auto margins */
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    text-align: center;
+    display: block; /* Ensures block layout for auto-centering */
+}
+
+.custom-btn:hover {
+    background-color: #45a049; /* Change color on hover */
+}

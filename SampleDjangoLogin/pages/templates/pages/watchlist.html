@@ -1,127 +1,13 @@
-<style>
-/* Watchlist container styling */
-.container {
-    background-color: #464646;
-}
-.watchlist-container {
-    width: 400px;
-    border: 1px solid #000000;
-    background-color: #202020;
-    border-radius: 6px;
-    margin-bottom: 50px;
-    padding-bottom: 0px !important;
-}
-
-.list-unstyled {
-    margin: 0px;
-}
-
-.WatchTop{
-    color: #FFFFFF;
-    position: relative;
-    left: 10px;
-}
-hr {
-    position: relative;
-    top: 50px;
-    width: 500px;
-}
-
-/* Star button styling */
-.star-button {
-    position: relative;
-    background-color: #202020;
-    left: 1px;
-    border: #2e2e2e;
-    border-bottom: 1px solid #ccc !important;
-    width: 50px;
-    height: 80px;
-    margin-right: 0px; /* Space between star and button */
-}
-
-.star-icon {
-    font-size: 20px;
-    color: gold;
-}
-
-.star-icon.active {
-    color: yellow;
-}
-
-/* Stock button styling */
-.stock_button {
-    flex-grow: 1;
-    background-color: #842525;
-    padding: 10px;
-    border-bottom: 1px solid #ccc !important;
-    border-radius: 0px !important;
-    height: 80px;
-    transition: background-color 0.3s ease;
-}
-
-.stock_button.selected {
-    background-color: #3D3D3D;
-}
-
-/* Prevent the hover effect from changing the color when selected */
-.stock_button.selected:hover {
-    background-color: #3D3D3D; /* Keeps the same background color */
-    cursor: pointer; /* Ensures the cursor still behaves like a clickable button */
-}
-
-/* Regular hover effect for non-selected buttons */
-.stock_button:hover {
-    background-color: #b00b0b; /* Change color for hover when not selected */
-}
-
-/* Ensure the star button has the same behavior */
-.star-button.selected:hover {
-    background-color: #3D3D3D; /* Keeps the same background color */
-}
-
-.star-button.selected {
-    background-color: #3D3D3D;
-}
-
-/* Stock details styling */
-.stock-name {
-    color: #FFFFFF;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-/* Stock pricing styling */
-.stock-pricing {
-    text-align: right;
-}
-
-.stock-price {
-    color: #FFFFFF;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.price-change {
-    font-size: 1rem;
-}
-
-/* Ensure no margin between buttons */
-.watchlist-item-container + .watchlist-item-container {
-    margin-top: 0px !important;
-}
-
-/* Divider styling */
-.section-divider {
-    border-top: 1px solid #ccc;
-    margin: 10px 0;
-}
-</style>
 {% extends "base.html" %}
 {% block page_content %}
-<div class="watchlist-container">
-    <h1 class="WatchTop">Watchlist</h1>
-    {% if watchlist %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/watchlist.css' %}">
+<div class="watchlist-container float-end">
         <div class="watchlist-card">
+            <div class="card-header">
+                <h4 class="Watchlist_Header">Watchlist</h4>
+              </div>
+              {% if watchlist %}
             <ul class="list-unstyled">
                 {% for stock in watchlist %}
                 <div class="watchlist-item-container d-flex align-items-center">

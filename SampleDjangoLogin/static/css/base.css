@@ -1,0 +1,66 @@
+/* Navbar stickiness and custom styles */
+.navbarcontainer {
+    position: sticky;
+    top: 0;  /* Stick to the top of the screen */
+    z-index: 1000;  /* Ensure it stays above other elements */
+}
+
+.navbar-custom {
+    background-color: #202020;
+    border-radius: 5px;  /* Removed !important for better control */
+    padding: 10px;
+    border: 0.5px solid #000000;  /* Keep border subtle */
+}
+
+/* Search bar styles */
+.search-bar {
+    width: 100%;
+    max-width: 400px;  /* Default max width */
+    margin-right: 10px;
+}
+
+@media (min-width: 992px) {
+    .search-bar {
+        max-width: 600px;  /* Expand search bar on larger screens */
+        min-width: 400px;
+    }
+}
+
+/* Notification text and icons */
+.notification-text {
+    color: #FFFFFF !important;
+}
+
+.notification-icon {
+    position: relative;
+    display: inline-block;
+}
+
+/* Notification bell and text for different screen sizes */
+.notification-text {
+    display: inline;  /* Show text on larger screens */
+}
+
+.notification-bell {
+    display: none;  /* Hide bell icon on larger screens */
+}
+
+@media (max-width: 768px) {
+    .notification-text {
+        display: none;  /* Hide text on smaller screens */
+    }
+
+    .notification-bell {
+        display: inline-block;  /* Show bell icon on smaller screens */
+    }
+
+}
+
+/* Nav item styles */
+.nav-item {
+    font-size: 18px;
+}
+
+.navbar .nav-item .nav-link.active {
+    color: #30A900 !important;  /* Highlight active link */
+}

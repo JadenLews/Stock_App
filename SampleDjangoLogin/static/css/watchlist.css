@@ -1,0 +1,84 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+.backyground {
+    background-color: #464646;
+}
+.container {
+    background-color: #464646;
+}
+.watchlist-container {
+    margin-top: 50px;
+    width: 300px;
+    border: 1px solid #000000;
+    background-color: #202020;
+    border-radius: 6px;
+    margin: 20px;
+}
+
+.list-unstyled {
+    margin: 0px;
+}
+
+.Watchlist_Header{
+    color: #FFFFFF;
+    margin: 10px;
+    font-size: 18px;
+}
+
+.star-button {
+    position: relative;
+    background-color: #202020;
+    left: 1px;
+    border: none;
+    border-top: 1px solid #ccc !important;
+    width: 40px;
+    height: 60px;
+    margin-right: 0px;
+}
+
+.star-icon {
+    font-size: 20px;
+    color: gold;
+}
+
+.star-icon.active {
+    color: yellow;
+}
+
+/* Stock button styling */
+.stock_button {
+    border-top: 1px solid #ccc !important;
+    border-radius: 0px !important;
+    height: 60px;
+}
+
+.star-button.selected + .star-button.selected:hover + .stock_button.selected:hover + .stock_button.selected{
+    background-color: #3D3D3D;
+}
+
+.stock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.stock-pricing {
+    text-align: right;
+}
+
+.stock-price {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.price-change {
+    font-size: 14px
+}
+
+/* Ensure no margin between buttons */
+.watchlist-item-container + .watchlist-item-container {
+    margin-top: 0px !important;
+}

@@ -25,5 +25,12 @@ urlpatterns = [
     path('register/', user_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='pages/logout.html',http_method_names = ['get', 'post', 'options']), name='logout'),
+    path("home/", user_views.home, name='home'),
+    path("portfolio/", user_views.portfolio, name='portfolio'),
+    path('watchlist/', user_views.user_watchlist, name='user_watchlist'),
+    path("notifications/", user_views.notifications, name='notifications'),
+    path('stock/<str:symbol>/', user_views.stock_details, name='stock_details'),
+    path('trade/execute/', user_views.execute_trade, name='execute_trade'),
     path('watchlist/toggle/<str:symbol>/', user_views.toggle_watchlist, name='toggle-watchlist'),
+    path('watchlist/toggle/<int:stock_id>/', user_views.toggle_watchlist, name='toggle_watchlist'),
  ]
