@@ -45,7 +45,7 @@ def stock_details(request, symbol):
     try:
         # Use yfinance to get stock info
         stock_info = yf.Ticker(symbol)
-        stock_price = stock_info.history(period="1d")['Close'][0]  # Fetch current price
+        stock_price = stock_info.history(period="1d")['Close'].iloc[0] # Fetch current price
         
         # Try to get the stock if it exists, or create a new entry
         stock, created = Stock.objects.get_or_create(
@@ -86,7 +86,7 @@ def user_watchlist(request):
         stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
         
         # Fetch current stock price and previous close price
-        current_price = round(stock_info.history(period="1d")['Close'][0], 2)  # Round to 2 decimals
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
         prev_close = stock_info.info['previousClose']
 
         # Calculate percentage change
@@ -110,7 +110,6 @@ def user_watchlist(request):
     }
     
     return render(request, 'pages/watchlist.html', context)
-
 @login_required
 @require_POST
 def toggle_watchlist(request, symbol):

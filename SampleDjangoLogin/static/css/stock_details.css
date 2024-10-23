@@ -2,7 +2,7 @@
     margin: 20px;
 }
 .backyground {
-    background-color: #464646;
+    background-color: #1c1c28;
 }
 .total_price, .stock_symbol {
     padding: 10px;
@@ -56,7 +56,7 @@ body, html {
     font-weight: 600;
 }
 .stockticker {
-    color: #464646;
+    color: #ffffff;
 }
 
 .total_price input {
@@ -69,7 +69,7 @@ body, html {
 
 .buy_sell {
     max-width: 400px;
-    background-color: #202020 !important;
+    background-color: #3e3e50 !important;
 }
 
 .action-item {
@@ -95,7 +95,7 @@ body, html {
 
 .custom-btn {
     width: 150px;
-    background-color: #30A900;
+    background-color: green;
     color: white;
     border: none;
     padding: 10px 20px;

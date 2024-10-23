@@ -1,66 +1,89 @@
-/* Navbar stickiness and custom styles */
+.navbar-custom {
+    padding: 15px 20px !important; /* Add more padding for balance */
+ }
+    /* Make the hamburger icon white */
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+
+    /* Change border when the hamburger button is clicked or focused */
+    .navbar-toggler {
+        border-color: transparent; /* Default state (no visible border) */
+    }
+
+    .navbar-toggler:focus, .navbar-toggler.collapsed:focus {
+        outline: none; /* Remove default focus outline */
+        border-color: rgba(255, 255, 255, 0.75); /* Light white border for visibility */
+    }
+
+    /* Optional: Add a subtle box shadow for additional visibility */
+    .navbar-toggler:focus, .navbar-toggler.collapsed:focus {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Light shadow for focus effect */
+    }
+.navbar-toggler-icon {
+    color: #FFFFFF;
+}
 .navbarcontainer {
     position: sticky;
-    top: 0;  /* Stick to the top of the screen */
-    z-index: 1000;  /* Ensure it stays above other elements */
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar-custom {
-    background-color: #202020;
-    border-radius: 5px;  /* Removed !important for better control */
+    background-color: #3e3e50;
+    border-radius: 5px;
     padding: 10px;
-    border: 0.5px solid #000000;  /* Keep border subtle */
+    border: 0.5px solid #000000;
 }
 
-/* Search bar styles */
-.search-bar {
-    width: 100%;
-    max-width: 400px;  /* Default max width */
-    margin-right: 10px;
+/* Nav links default color */
+.nav-link {
+    color: #FFFFFF !important;  /* Set default link color to white */
 }
 
-@media (min-width: 992px) {
-    .search-bar {
-        max-width: 600px;  /* Expand search bar on larger screens */
-        min-width: 400px;
-    }
+/* Active state for notification and other nav links */
+.navbar .nav-item .nav-link.active {
+    color: #30A900 !important;  /* Highlight active link in green */
 }
 
 /* Notification text and icons */
-.notification-text {
-    color: #FFFFFF !important;
-}
-
 .notification-icon {
     position: relative;
     display: inline-block;
 }
 
-/* Notification bell and text for different screen sizes */
 .notification-text {
-    display: inline;  /* Show text on larger screens */
+    color: inherit;  /* Inherit color from the parent nav link */
 }
 
 .notification-bell {
-    display: none;  /* Hide bell icon on larger screens */
+    display: none;
 }
 
+.notification-icon.active .notification-text,
+.notification-icon.active .notification-bell {
+    color: #30A900 !important;  /* Green for active notification icon */
+}
+
+/* Show bell icon on smaller screens */
 @media (max-width: 768px) {
     .notification-text {
-        display: none;  /* Hide text on smaller screens */
+        display: none;
     }
 
     .notification-bell {
-        display: inline-block;  /* Show bell icon on smaller screens */
+        display: inline-block;
+        color: inherit;
     }
-
+}
+.search-bar {
+    border: 1px solid #555;
+    box-shadow: 0 2px 4px rgba(28, 28, 40, 0.8);  /* Dark shadow with #1c1c28 color */
+    border-radius: 5px;  /* Optional: add slight rounding for smoother look */
 }
 
-/* Nav item styles */
-.nav-item {
-    font-size: 18px;
-}
-
-.navbar .nav-item .nav-link.active {
-    color: #30A900 !important;  /* Highlight active link */
+.search-bar:focus {
+    border-color: #1c1c28;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(28, 28, 40, 0.8);  /* Darker shadow on focus */
 }

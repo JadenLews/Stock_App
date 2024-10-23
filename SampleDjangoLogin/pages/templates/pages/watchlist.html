@@ -83,18 +83,18 @@
     });
 });
 
-        // Handle stock button selection
-        document.querySelectorAll('.stock_button').forEach(button => {
-    button.addEventListener('click', function () {
-        // Remove "selected" class from all buttons
-        document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
-        document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
+// Handle stock button selection
+document.querySelectorAll('.stock_button').forEach(button => {
+        button.addEventListener('click', function () {
+            // Remove "selected" class from all buttons
+            document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
 
-        // Add "selected" class to the clicked button and its star button
-        this.classList.add('selected');
-        this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+            // Add "selected" class to the clicked button and its star button
+            this.classList.add('selected');
+            this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+        });
     });
-});
     </script>
     <script>
         // Add CSRF token for AJAX requests

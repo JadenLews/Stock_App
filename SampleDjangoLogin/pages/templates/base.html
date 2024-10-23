@@ -16,6 +16,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <!-- Custom styles for the white hamburger icon -->
+    <style>
+        /* Make the hamburger icon white */
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+    </style>
 </head>
 <body class="backyground">
     <nav class="navbar navbar-expand-lg navbar-custom w-100 navbarcontainer" style="font-family: 'IBM Plex Sans', sans-serif; font-weight: 400;">
@@ -33,11 +41,11 @@
                     <!-- Notifications link always next to search bar with responsive text and bell icon -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a href="/notifications" class="nav-link notification-icon {% if request.path == '/notifications/' %}active{% endif %}" style="margin-right: 20px; color: #000000; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">
+                            <a href="/notifications" class="nav-link notification-icon {% if request.path == '/notifications/' %}active{% endif %}" style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">
                                 <!-- Text for larger screens -->
-                                <span class="notification-text">Notifications</span>
+                                <span class="notification-text" style="color: inherit;">Notifications</span>
                                 <!-- Bell icon for smaller screens -->
-                                <span class="notification-bell">
+                                <span class="notification-bell" style="color: inherit;">
                                     <i class="bi bi-bell"></i>
                                 </span>
                             </a>
@@ -56,13 +64,13 @@
                 <!-- Left-aligned links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a href="/home/" class="nav-link {% if request.path == '/home/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Dashboard</a>
+                        <a href="/home/" class="nav-link {% if request.path == '/home/' %}active{% endif %}" style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a href="/portfolio/" class="nav-link {% if request.path == '/portfolio/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Portfolio</a>
+                        <a href="/portfolio/" class="nav-link {% if request.path == '/portfolio/' %}active{% endif %}" style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Portfolio</a>
                     </li>
                     <li class="nav-item">
-                        <a href="/watchlist/" class="nav-link {% if request.path == '/watchlist/' %}active{% endif %}" style="margin-right: 20px; color: #FFFFFF; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Watchlist</a>
+                        <a href="/watchlist/" class="nav-link {% if request.path == '/watchlist/' %}active{% endif %}" style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">Watchlist</a>
                     </li>
                 </ul>
             </div>
