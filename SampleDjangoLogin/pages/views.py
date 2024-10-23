@@ -72,6 +72,7 @@ def stock_details(request, symbol):
         return render(request, 'pages/stock_details.html', {'error': 'Invalid stock symbol or missing data from the API.'})
 
 
+
 @login_required
 def user_watchlist(request):
     # Fetch the watchlist for the current logged-in user
