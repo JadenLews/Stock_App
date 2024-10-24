@@ -12,6 +12,7 @@ from .models import Watchlist, Stock
 from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from datetime import datetime
 
 def register(request):
     if request.method == 'POST':
@@ -39,7 +40,81 @@ def notifications(request):
     return render(request, "pages/notifications.html")
 
 def portfolio(request):
-    return render(request, "pages/portfolio.html")
+    # Fetch the watchlist for the current logged-in user
+    user_watchlist = Watchlist.objects.filter(user=request.user)
+
+    # Initialize an empty list to hold stock data
+    stock_data = []
+
+    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
+    for entry in user_watchlist:
+        stock_symbol = entry.stock.symbol  # Get the stock symbol from your model
+        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        
+        # Fetch current stock price and previous close price
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        prev_close = stock_info.info['previousClose']
+
+        # Calculate percentage change
+        percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
+
+        # Determine if the stock is up or down based on the percentage change
+        price_change_direction = 'up' if percent_change > 0 else 'down'
+
+        # Append the data for this stock to the stock_data list
+        stock_data.append({
+            'symbol': stock_symbol,
+            'company_name': entry.stock.company_name,
+            'current_price': current_price,
+            'percent_change': percent_change,
+            'change_direction': price_change_direction
+        })
+        
+    # Fetch the watchlist for the current logged-in user
+    portfolio_stocks = Portfolio.objects.filter(user=request.user)
+
+    # Initialize an empty list to hold stock data
+    portfolio_data = []
+
+    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
+    for entry in portfolio_stocks:
+        stock_symbol = entry.stock.symbol
+        stock_quantity = entry.num_shares
+        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        
+        # Fetch current stock price and previous close price
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        prev_close = stock_info.info['previousClose']
+
+        # Calculate percentage change
+        percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
+
+        # Determine if the stock is up or down based on the percentage change
+        price_change_direction = 'up' if percent_change > 0 else 'down'
+
+        # Append the data for this stock to the stock_data list
+        portfolio_data.append({
+            'symbol': stock_symbol,
+            'company_name': entry.stock.company_name,
+            'quantity': stock_quantity,
+            'current_price': current_price,
+            'percent_change': percent_change,
+            'change_direction': price_change_direction
+        })
+        
+    current_time = datetime.now().strftime("%I:%M:%S %p")
+    current_date = datetime.now().strftime("%M/%d/%Y")
+
+
+    # Pass the stock data to the template
+    context = {
+        'watchlist': stock_data,
+        'markets': portfolio_data,
+        'time': current_time,
+        'date': current_date,
+    }
+    
+    return render(request, "pages/portfolio.html", context)
 
 def stock_details(request, symbol):
     try:

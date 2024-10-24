@@ -1,0 +1,172 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.backyground {
+    background-color: #1c1c28;
+}
+
+.container {
+    background-color: #464646;
+    display: flex; /* Use flexbox for the layout */
+}
+
+/* Left Column (Portfolio) */
+.portfolio-container {
+    margin-top: 50px;
+    width: 70%; /* Set width for left column */
+    border: 1px solid #000000;
+    background-color: #3e3e50;
+    border-radius: 6px;
+    margin: 20px;
+    overflow: auto; /* Ensure overflow is handled correctly */
+}
+
+/* Right Column (Watchlist & Markets) */
+.right-column {
+    width: 30%; /* Set width for right column */
+    display: flex;
+    flex-direction: column; /* Stack containers vertically */
+}
+
+/* Watchlist and Markets Container Styles */
+.watchlist-container, .markets-container {
+    margin-top: 20px; /* Space between containers */
+    border: 1px solid #000000;
+    background-color: #3e3e50;
+    border-radius: 6px;
+    margin: 20px;
+}
+
+.Watchlist_Header, .Markets_Header, .Portfolio_Header {
+    color: #FFFFFF;
+    margin: 10px;
+    font-size: 18px;
+}
+
+/* New Portfolio Table Styles */
+.portfolio-table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse; /* Remove spacing between cells */
+}
+
+.portfolio-row {
+    display: table-row; /* Each row in the table */
+    border-bottom: 1px solid #ddd; /* Border for separating rows */
+}
+
+.portfolio-cell {
+    display: table-cell; /* Each cell in the row */
+    padding: 10px;
+    border: none; /* Remove borders between individual cells */
+    background-color: #3e3e50; /* Cell background color */
+    color: #FFFFFF; /* Text color */
+    text-align: left; /* Align text to the left */
+}
+
+/* Specific styles for the header row */
+.portfolio-row.header {
+    font-weight: bold; /* Bold header row */
+    background-color: #292936; /* Different color for header */
+}
+
+/* Additional styles */
+.list-unstyled {
+    margin: 0px;
+}
+
+.star-button {
+    position: relative;
+    background-color: #3e3e50;
+    left: 1px;
+    border: none;
+    width: 40px;
+    height: 60px;
+    margin-right: 0px;
+}
+
+.star-icon {
+    font-size: 20px;
+    color: gold;
+}
+
+.star-icon.active {
+    color: yellow;
+}
+
+/* Stock button styling */
+.stock_button {
+    border-top: 1px solid #ccc !important; /* Keep border for consistency */
+    border-radius: 0px !important;
+    height: 60px;
+    background-color: #3e3e50;  /* Default background color */
+    color: white;  /* Default text color */
+    padding: 0;  /* Adjust padding if needed */
+    border: none; /* Remove any visible border that could interfere */
+}
+
+/* When the stock button is selected */
+.stock_button.selected {
+    background-color: #292936;  /* Background color when selected */
+    color: white;  /* Ensure the text is white or your preferred color */
+    border: none; /* Ensure no extra borders are interfering */
+}
+
+/* Hover effect for stock button */
+.stock_button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+    color: white;  /* Text color on hover */
+    border: none; /* Remove any border interference */
+}
+
+/* Additional styles for selected buttons and layout... */
+.portfoliostyling {
+    border-top: 1px solid #ccc !important; /* Keep border for consistency */
+    border-radius: 0px !important;
+    height: 60px;
+    background-color: #3e3e50;  /* Default background color */
+    color: white;  /* Default text color */
+    padding: 0;  /* Adjust padding if needed */
+    border: none; /* Remove any visible border that could interfere */
+}
+
+.stock-pricing {
+    text-align: right;
+    padding-right: 8px;
+}
+
+.stock-price {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.turn-white {
+    color: #FFFFFF;
+}
+
+.price-change {
+    font-size: 14px;
+}
+
+.stock-details {
+    padding: 8px;
+}
+
+.watchlist-card, .search-bar, .btn, .markets-card, .portfolio-card {
+    border-radius: 10px; /* Smooth rounded corners */
+}
+
+.watchlist-card, .markets-card, .portfolio-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.watchlist-item-container:last-child,
+.markets-item-container:last-child,
+.portfolio-item-container:last-child {
+    border-bottom-left-radius: 6px !important;  /* Match the container's rounding */
+    border-bottom-right-radius: 6px !important; /* Match the container's rounding */
+    overflow: hidden !important; /* Prevent overflow beyond the container */
+}
