@@ -6,14 +6,14 @@
 }
 .total_price, .stock_symbol {
     padding: 10px;
-    border-bottom: 1px solid #777777;
+    border-bottom: 1px solid #ccc;
 }
 
 .card-header {
     display: flex;
     justify-content: center; /* Centers the content horizontally */
     align-items: center; /* Centers the content vertically (if necessary) */
-    border-bottom: 2px solid #777777;
+    border-bottom: 2px solid #ccc !important;
 }
 
 body, html {

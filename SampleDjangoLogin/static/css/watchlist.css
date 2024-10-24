@@ -105,8 +105,7 @@ body, html {
 
 .stock-pricing {
     text-align: right;
-    padding-right: 8px;
-    
+    padding-right: 8px; 
 }
 
 .stock-price {
@@ -126,8 +125,8 @@ body, html {
 .watchlist-card, .search-bar, .btn {
     border-radius: 10px; /* Smooth rounded corners */
 }
-.watchlist-card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+.watchlist-card, .search-bar, .btn {
+    border-radius: 10px; /* Smooth rounded corners */
 }
 .watchlist-item-container:last-child {
     border-bottom-left-radius: 6px !important;  /* Match the container's rounding */

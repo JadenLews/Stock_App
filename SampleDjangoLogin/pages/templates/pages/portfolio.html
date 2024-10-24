@@ -27,13 +27,15 @@
                     {% for stock in markets %}
                     <div class="portfolio-row">
                         <div class="portfolio-cell">{{ stock.symbol |upper }}</div>
-                        <div class="portfolio-cell">{{ stock.quantity }}</div>
-                        <div class="portfolio-cell">${{ stock.current_price }}</div>
+                        <div class="portfolio-cell">{{ stock.quantity |floatformat:2}}</div>
+                        <div class="portfolio-cell">${{ stock.current_price |floatformat:2}}</div>
                         <div class="portfolio-cell {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
-                            {{ stock.percent_change }}%
+                            {{ stock.percent_change |floatformat:2}}%
                         </div>
-                        <div class="portfolio-cell">${{ stock.market_cap }}</div>
-                        <div class="portfolio-cell">{{ stock.pe_ratio }}</div>
+                        <div class="portfolio-cell">${{ stock.total_value |floatformat:2}}</div>
+                        <div class="portfolio-cell {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
+                            {{ stock.value_lost |floatformat:2}}
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -45,40 +47,124 @@
     </div>
 
     <!-- Right Column: Watchlist and Markets -->
-    <div class="right-column">
+    <div class="float-end">
         <div class="watchlist-container">
-            <div class="watchlist-card">
-                <div class="card-header">
-                    <h4 class="Watchlist_Header">Watchlist</h4>
-                </div>
-                {% if watchlist %}
-                <ul class="list-unstyled">
-                    {% for stock in watchlist %}
-                    <div class="watchlist-item-container d-flex align-items-center">
-                        <button type="button" class="star-button" data-stock-symbol="{{ stock.symbol }}">
-                            <span class="star-icon {% if stock.symbol in watchlist %}active{% endif %}">&#9733;</span>
-                        </button>
-                        <button type="button" class="btn stock_button flex-grow-1">
-                            <div class="watchlist-item d-flex justify-content-between align-items-center">
-                                <div class="stock-details">
-                                    <span class="stock-name">{{ stock.symbol |upper }}</span>
-                                </div>
-                                <div class="stock-pricing text-end">
-                                    <div class="stock-price">${{ stock.current_price }}</div>
-                                    <div class="price-change {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
-                                        {{ stock.percent_change }}%
-                                    </div>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p>You have no stocks in your watchlist.</p>
-                {% endif %}
+        <div class="watchlist-card">
+            <div class="card-header">
+                <h4 class="Watchlist_Header">Watchlist</h4>
+              </div>
+              {% if watchlist %}
+            <ul class="list-unstyled">
+                {% for stock in watchlist %}
+                <div class="watchlist-item-container d-flex align-items-center">
+                    <!-- Left: Star Icon (watchlist toggle) -->
+                    <button type="button" class="star-button" data-stock-symbol="{{ stock.symbol }}">
+                        <span class="star-icon {% if stock.symbol in watchlist %}active{% endif %}">&#9733;</span>
+                    </button>
+                
+                    <!-- Right: Stock Button (stock details) -->
+                    <!-- Stock Button with a dynamic URL for the stock symbol -->
+<button type="button" class="btn stock_button flex-grow-1" data-url="/stock/{{ stock.symbol | lower }}/">
+    <div class="watchlist-item d-flex justify-content-between align-items-center">
+        <!-- Stock Symbol and Name -->
+        <div class="stock-details">
+            <span class="stock-name">{{ stock.symbol | upper }}</span>
+        </div>
+
+        <!-- Stock Price and Percentage Change -->
+        <div class="stock-pricing text-end">
+            <div class="stock-price">${{ stock.current_price }}</div>
+            <div class="price-change {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
+                {{ stock.percent_change }}%
             </div>
-        </div> <!-- End of watchlist-container -->
+        </div>
+    </div>
+</button>
+                </div>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <p>You have no stocks in your watchlist.</p>
+    {% endif %}
+    
+    <!-- JavaScript for button behavior -->
+    <script>
+        // Handle stock button selection and navigation
+document.querySelectorAll('.stock_button').forEach(button => {
+    button.addEventListener('click', function () {
+        // Read the URL from the data-url attribute
+        const url = this.getAttribute('data-url');
+        if (url) {
+            window.location.href = url;  // Redirect to the dynamically constructed URL
+        }
+
+        // Optional: Handle button selection styling
+        document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
+        document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
+
+        this.classList.add('selected');
+        this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+    });
+});
+        // Handle watchlist star button click
+        let isProcessing = false;
+
+        document.querySelectorAll('.star-button').forEach(button => {
+    button.addEventListener('click', function (e) {
+        e.stopPropagation(); // Prevent stock button click
+
+        const stockSymbol = this.getAttribute('data-stock-symbol');
+        const starIcon = this.querySelector('.star-icon');
+        const watchlistItemContainer = this.closest('.watchlist-item-container');
+        const isActive = starIcon.classList.contains('active');
+
+        // Send the correct action (add or remove) based on current state
+        const action = isActive ? 'add' : 'remove';
+
+        // AJAX call to toggle watchlist status
+        fetch(`/watchlist/toggle/${stockSymbol}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Toggle the star icon's active state
+                starIcon.classList.toggle('active');
+
+                // If removing, also remove the item from the DOM
+                if (action === 'remove') {
+                    watchlistItemContainer.remove();
+                }
+            }
+        })
+        .catch(err => console.error('Error:', err));
+    });
+});
+
+// Handle stock button selection
+document.querySelectorAll('.stock_button').forEach(button => {
+        button.addEventListener('click', function () {
+            // Remove "selected" class from all buttons
+            document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
+
+            // Add "selected" class to the clicked button and its star button
+            this.classList.add('selected');
+            this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+        });
+    });
+    </script>
+    <script>
+        // Add CSRF token for AJAX requests
+        const csrfToken = "{{ csrf_token }}";  // This ensures you have access to the CSRF token from Django
+    </script>
+</div>
 
         <div class="markets-container">
             <div class="markets-card">
@@ -115,65 +201,7 @@
 
 {% block scripts %}
 <!-- JavaScript for button behavior -->
-<script>
-    // Handle watchlist star button click
-    let isProcessing = false;
 
-    document.querySelectorAll('.star-button').forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.stopPropagation(); // Prevent stock button click
-
-            const stockSymbol = this.getAttribute('data-stock-symbol');
-            const starIcon = this.querySelector('.star-icon');
-            const watchlistItemContainer = this.closest('.watchlist-item-container');
-            const isActive = starIcon.classList.contains('active');
-
-            // Send the correct action (add or remove) based on current state
-            const action = isActive ? 'add' : 'remove';
-
-            // AJAX call to toggle watchlist status
-            fetch(`/watchlist/toggle/${stockSymbol}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({ action })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Toggle the star icon's active state
-                    starIcon.classList.toggle('active');
-
-                    // If removing, also remove the item from the DOM
-                    if (action === 'remove') {
-                        watchlistItemContainer.remove();
-                    }
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        });
-    });
-
-    // Handle stock button selection
-    document.querySelectorAll('.stock_button').forEach(button => {
-        button.addEventListener('click', function () {
-            // Remove "selected" class from all buttons
-            document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
-            document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
-
-            // Add "selected" class to the clicked button and its star button
-            this.classList.add('selected');
-            this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
-        });
-    });
-</script>
-
-<script>
-    // Add CSRF token for AJAX requests
-    const csrfToken = "{{ csrf_token }}";  // This ensures you have access to the CSRF token from Django
-</script>
 {% endblock %}
 
 {% endblock %}

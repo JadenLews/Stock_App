@@ -13,6 +13,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from datetime import datetime
+import pytz
 
 def register(request):
     if request.method == 'POST':
@@ -99,11 +100,13 @@ def portfolio(request):
             'quantity': stock_quantity,
             'current_price': current_price,
             'percent_change': percent_change,
-            'change_direction': price_change_direction
+            'change_direction': price_change_direction,
+            'total_value' : float(stock_quantity) * float(current_price),
+            'value_lost' : (float(percent_change) / 100) * (float(stock_quantity) * float(current_price))
         })
-        
-    current_time = datetime.now().strftime("%I:%M:%S %p")
-    current_date = datetime.now().strftime("%M/%d/%Y")
+    eastern = pytz.timezone('US/Eastern')
+    current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
+    current_date = datetime.now(eastern).strftime("%m/%d/%Y")
 
 
     # Pass the stock data to the template

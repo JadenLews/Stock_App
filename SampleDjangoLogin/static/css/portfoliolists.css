@@ -30,9 +30,9 @@ body, html {
     flex-direction: column; /* Stack containers vertically */
 }
 
-/* Watchlist and Markets Container Styles */
-.watchlist-container, .markets-container {
-    margin-top: 20px; /* Space between containers */
+.watchlist-container , .markets-container{
+    margin-top: 50px;
+    width: 300px;
     border: 1px solid #000000;
     background-color: #3e3e50;
     border-radius: 6px;
@@ -72,7 +72,6 @@ body, html {
     background-color: #292936; /* Different color for header */
 }
 
-/* Additional styles */
 .list-unstyled {
     margin: 0px;
 }
@@ -82,6 +81,7 @@ body, html {
     background-color: #3e3e50;
     left: 1px;
     border: none;
+    border-top: 1px solid #ccc !important;
     width: 40px;
     height: 60px;
     margin-right: 0px;
@@ -98,7 +98,7 @@ body, html {
 
 /* Stock button styling */
 .stock_button {
-    border-top: 1px solid #ccc !important; /* Keep border for consistency */
+    border-top: 1px solid #ccc !important;
     border-radius: 0px !important;
     height: 60px;
     background-color: #3e3e50;  /* Default background color */
@@ -148,11 +148,11 @@ body, html {
 }
 
 .price-change {
-    font-size: 14px;
+    font-size: 14px
 }
 
 .stock-details {
-    padding: 8px;
+    padding-right: 5px;
 }
 
 .watchlist-card, .search-bar, .btn, .markets-card, .portfolio-card {
@@ -170,3 +170,32 @@ body, html {
     border-bottom-right-radius: 6px !important; /* Match the container's rounding */
     overflow: hidden !important; /* Prevent overflow beyond the container */
 }
+
+.star-button.selected {
+    background-color: #292936;  /* Background color for selected star */
+    border: none; /* Ensure no borders interfere with the background */
+}
+
+.star-button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+}
+
+.stock_button.selected:hover {
+    background-color: #292936; /* Your custom hover color while clicked */
+}
+
+.stock_button, .star-button {
+    outline: none;
+    box-shadow: none;  /* Removes any shadow effect */
+}
+
+.stock_button, .star-button {
+    transition: background-color 0.3s ease, color 0.3s ease; /* You can adjust the time and effect */
+}
+
+.stock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+}
+
