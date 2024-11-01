@@ -33,12 +33,24 @@ def register(request):
 
 def home(request):
     return render(request, "pages/home.html")
+@login_required
+def notifications(request, stock_symbol=None):
+    # Fetch all notifications for the logged-in user
+    user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Fetch notifications related to a specific stock if the stock_symbol is provided
+    if stock_symbol:
+        detailed_notifications = Notification.objects.filter(user=request.user, stock__symbol__iexact=stock_symbol).order_by('-created_at')
+    else:
+        detailed_notifications = None
 
-def watchlist(request):
-    return render(request, "pages/watchlist.html")
-
-def notifications(request):
-    return render(request, "pages/notifications.html")
+    context = {
+        'notifications': user_notifications,
+        'detailed_notifications': detailed_notifications,
+        'selected_stock_symbol': stock_symbol,
+    }
+    
+    return render(request, "pages/notifications.html", context)
 
 def portfolio(request):
     # Fetch the watchlist for the current logged-in user

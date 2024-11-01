@@ -41,8 +41,9 @@
                     <!-- Notifications link always next to search bar with responsive text and bell icon -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a href="/notifications" class="nav-link notification-icon {% if request.path == '/notifications/' %}active{% endif %}" style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">
-                                <!-- Text for larger screens -->
+                            <a href="/notifications" class="nav-link notification-icon 
+{% if '/notifications/' in request.path %}active{% endif %}" 
+style="margin-right: 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;">
                                 <span class="notification-text" style="color: inherit;">Notifications</span>
                                 <!-- Bell icon for smaller screens -->
                                 <span class="notification-bell" style="color: inherit;">

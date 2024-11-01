@@ -28,6 +28,7 @@ urlpatterns = [
     path("home/", user_views.home, name='home'),
     path("portfolio/", user_views.portfolio, name='portfolio'),
     path('watchlist/', user_views.user_watchlist, name='user_watchlist'),
+    path('notifications/<str:stock_symbol>/', user_views.notifications, name='filtered_notifications'),
     path("notifications/", user_views.notifications, name='notifications'),
     path('stock/<str:symbol>/', user_views.stock_details, name='stock_details'),
     path('trade/execute/', user_views.execute_trade, name='execute_trade'),
