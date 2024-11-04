@@ -33,23 +33,36 @@ def register(request):
 
 def home(request):
     return render(request, "pages/home.html")
+
 @login_required
-def notifications(request, stock_symbol=None):
+def notifications(request, notification_id=None):
     # Fetch all notifications for the logged-in user
     user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    
-    # Fetch notifications related to a specific stock if the stock_symbol is provided
-    if stock_symbol:
-        detailed_notifications = Notification.objects.filter(user=request.user, stock__symbol__iexact=stock_symbol).order_by('-created_at')
-    else:
-        detailed_notifications = None
+
+    selected_notification = None
+    selected_stock_symbol = None
+    detailed_notifications = None
+
+    if notification_id:
+        selected_notification = Notification.objects.filter(user=request.user, id=notification_id).first()
+        if selected_notification and selected_notification.stock:
+            selected_stock_symbol = selected_notification.stock.symbol
+            detailed_notifications = Notification.objects.filter(
+                user=request.user, stock__symbol__iexact=selected_stock_symbol
+            ).order_by('-created_at')
+
+        # Mark the selected notification as 'viewed'
+        if selected_notification and selected_notification.status == 'unviewed':
+            selected_notification.status = 'viewed'
+            selected_notification.save()
 
     context = {
         'notifications': user_notifications,
         'detailed_notifications': detailed_notifications,
-        'selected_stock_symbol': stock_symbol,
+        'selected_stock_symbol': selected_stock_symbol,
+        'selected_notification_id': notification_id,  # Pass this to highlight the clicked notification
     }
-    
+
     return render(request, "pages/notifications.html", context)
 
 def portfolio(request):

@@ -55,3 +55,4 @@ class Notification(models.Model):
     stock = models.ForeignKey('Stock', null=True, blank=True, on_delete=models.CASCADE, related_name='notifications')  # Stock related to the notification, nullable for system notifications
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unviewed')  # Status of the notification
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
+    

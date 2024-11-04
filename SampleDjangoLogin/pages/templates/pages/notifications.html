@@ -38,6 +38,8 @@ body, html {
     flex-grow: 1;  /* Takes 1 part of the available space */
     overflow-y: auto;  /* Enable scrolling if content exceeds the height */
     border-radius: 5px;
+    background: linear-gradient(to bottom, #3e3e50, #2c2c38);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
 }
 
 .extended {
@@ -61,7 +63,14 @@ body, html {
 .notification-item-container {
     margin: 0px;
     width: 100%;
-    border-bottom: 1px solid #ccc !important;
+    margin-bottom: 10px;
+    
+}
+
+.short::-webkit-scrollbar-thumb {
+    position: fixed;
+    background-color: #5e5e7d;
+    border-radius: 10px;
 }
 
 .notification_button {
@@ -71,6 +80,33 @@ body, html {
     border: none;
     border-radius: 0px;
     text-align: left;
+    border-radius: 10px;
+    padding: 10px;
+    
+}
+
+.notification-detail.selected-detail {
+    background-color: #202020; /* A darker color to differentiate */
+    border: 3px solid #ffffff; /* A green border for emphasis */
+    color: #ffffff; /* Maintain readable text */
+}
+
+.viewed {
+    background-color: #4a4a5c; /* New color for viewed notifications */
+}
+
+.unviewed {
+    background-color: #646481; /* New color for unviewed notifications */
+}
+
+.current {
+    border-left: 5px solid #30A900; /* Green border for the selected notification */
+}
+
+.notification_button:hover {
+    background-color: #4a4a5c;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
 }
 
 .symbol-circle {
@@ -221,51 +257,55 @@ body, html {
 
 <div class="block">
     <!-- Left: Notifications List (Pop-out on mobile) -->
-    <div class="cards short" id="notifBar">
-        <button class="close-btn" onclick="closeNotifBar()">Close</button>
-        <ul class="list-unstyled">
-            {% for notif in notifications %}
-            <div class="notification-item-container d-flex align-items-center">
-                <!-- Notification Button -->
-                <button type="button" class="btn notification_button flex-grow-1" onclick="window.location.href='/notifications/{{ notif.stock.symbol }}';">
-                    <div class="notification-item d-flex justify-content-between align-items-center">
-                        <div class="symbol-circle d-flex align-items-center justify-content-center">
-                            <span class="symbol-text">{{ notif.stock.symbol|upper }}</span>
+    <!-- Left: Notifications List (Pop-out on mobile) -->
+<div class="cards short" id="notifBar">
+    <button class="close-btn" onclick="closeNotifBar()">Close</button>
+    <ul class="list-unstyled">
+        {% for notif in notifications %}
+        <div class="notification-item-container d-flex align-items-center">
+            <!-- Notification Button -->
+            <button type="button" class="btn notification_button flex-grow-1 
+            {% if notif.status == 'viewed' %}viewed{% else %}unviewed{% endif %} 
+            {% if notif.id == selected_notification_id %}current{% endif %}"
+            onclick="window.location.href='/notifications/{{ notif.id }}';">
+                <div class="notification-item d-flex justify-content-between align-items-center">
+                    <div class="symbol-circle d-flex align-items-center justify-content-center">
+                        <span class="symbol-text">{{ notif.stock.symbol|upper }}</span>
+                    </div>
+                    <div class="notification-details flex-grow-1 ms-3">
+                        <div class="d-flex justify-content-between align-items-center thething">
+                            <span class="company-name">{{ notif.stock.company_name |truncatewords:5 }}</span>
+                            <span class="notification-date">{{ notif.created_at|date:"M d" }}</span>
                         </div>
-                        <div class="notification-details flex-grow-1 ms-3">
-                            <div class="d-flex justify-content-between align-items-center thething">
-                                <span class="company-name">{{ notif.stock.company_name |truncatewords:5 }}</span>
-                                <span class="notification-date">{{ notif.created_at|date:"M d" }}</span>
-                            </div>
-                            <div class="message-preview text-muted">
-                                {{ notif.message|truncatewords:6 }}
-                            </div>
+                        <div class="message-preview text-muted">
+                            {{ notif.message|truncatewords:6 }}
                         </div>
                     </div>
-                </button>
-            </div>
-            {% endfor %}
-        </ul>
-    </div>
+                </div>
+            </button>
+        </div>
+        {% endfor %}
+    </ul>
+</div>
 
     <!-- Right: Detailed Notifications -->
-    <div class="cards extended">
-        {% if detailed_notifications %}
-        <h4 class="notiftitle">{{ selected_stock_symbol|upper }}</h4>
-        <ul class="list-unstyled">
-            {% for notif in detailed_notifications %}
-            <li class="notiflist">
-                <p class="datenotif">{{ notif.created_at }}</p>
-                <div class="notification-detail">
-                    <h5>{{ notif.message }}</h5>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>Select a notification to see more details.</p>
-        {% endif %}
-    </div>
+<div class="cards extended">
+    {% if detailed_notifications %}
+    <h4 class="notiftitle">{{ selected_stock_symbol|upper }}</h4>
+    <ul class="list-unstyled">
+        {% for notif in detailed_notifications %}
+        <li class="notiflist">
+            <p class="datenotif">{{ notif.created_at }}</p>
+            <div class="notification-detail {% if notif.id == selected_notification_id %}selected-detail{% endif %}">
+                <h5>{{ notif.message }}</h5>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Select a notification to see more details.</p>
+    {% endif %}
+</div>
 </div>
 <script>
     function openNotifBar() {
@@ -275,5 +315,25 @@ body, html {
     function closeNotifBar() {
         document.getElementById("notifBar").style.display = "none";
     }
+
+
+
+
+    // Save the scroll position before navigating
+document.querySelectorAll('.notification_button').forEach(button => {
+    button.addEventListener('click', () => {
+        const notifBar = document.getElementById('notifBar');
+        sessionStorage.setItem('notifScrollPosition', notifBar.scrollTop);
+    });
+});
+
+// Restore the scroll position when the page loads
+window.addEventListener('load', () => {
+    const notifBar = document.getElementById('notifBar');
+    const savedPosition = sessionStorage.getItem('notifScrollPosition');
+    if (savedPosition !== null) {
+        notifBar.scrollTop = savedPosition;
+    }
+});
     </script>
 {% endblock %}
