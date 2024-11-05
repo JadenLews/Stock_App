@@ -86,8 +86,8 @@ body, html {
 }
 
 .notification-detail.selected-detail {
-    background-color: #202020; /* A darker color to differentiate */
-    border: 3px solid #ffffff; /* A green border for emphasis */
+    background-color: #4a4a4a; /* A darker color to differentiate */
+    
     color: #ffffff; /* Maintain readable text */
 }
 
@@ -257,36 +257,34 @@ body, html {
 
 <div class="block">
     <!-- Left: Notifications List (Pop-out on mobile) -->
-    <!-- Left: Notifications List (Pop-out on mobile) -->
-<div class="cards short" id="notifBar">
-    <button class="close-btn" onclick="closeNotifBar()">Close</button>
-    <ul class="list-unstyled">
-        {% for notif in notifications %}
-        <div class="notification-item-container d-flex align-items-center">
-            <!-- Notification Button -->
-            <button type="button" class="btn notification_button flex-grow-1 
-            {% if notif.status == 'viewed' %}viewed{% else %}unviewed{% endif %} 
-            {% if notif.id == selected_notification_id %}current{% endif %}"
-            onclick="window.location.href='/notifications/{{ notif.id }}';">
-                <div class="notification-item d-flex justify-content-between align-items-center">
-                    <div class="symbol-circle d-flex align-items-center justify-content-center">
-                        <span class="symbol-text">{{ notif.stock.symbol|upper }}</span>
-                    </div>
-                    <div class="notification-details flex-grow-1 ms-3">
-                        <div class="d-flex justify-content-between align-items-center thething">
-                            <span class="company-name">{{ notif.stock.company_name |truncatewords:5 }}</span>
-                            <span class="notification-date">{{ notif.created_at|date:"M d" }}</span>
+    <div class="cards short" id="notifBar">
+        <button class="close-btn" onclick="closeNotifBar()">Close</button>
+        <ul class="list-unstyled">
+            {% for notif in notifications %}
+            <div class="notification-item-container d-flex align-items-center">
+                <button type="button" class="btn notification_button flex-grow-1 
+                {% if notif.status == 'viewed' %}viewed{% else %}unviewed{% endif %}
+                {% if notif.id == selected_notification_id %}current{% endif %}" 
+                onclick="window.location.href='/notifications/{{ notif.id }}';">
+                    <div class="notification-item d-flex justify-content-between align-items-center">
+                        <div class="symbol-circle d-flex align-items-center justify-content-center">
+                            <span class="symbol-text">{{ notif.stock.symbol|upper }}</span>
                         </div>
-                        <div class="message-preview text-muted">
-                            {{ notif.message|truncatewords:6 }}
+                        <div class="notification-details flex-grow-1 ms-3">
+                            <div class="d-flex justify-content-between align-items-center thething">
+                                <span class="company-name">{{ notif.stock.company_name |truncatewords:5 }}</span>
+                                <span class="notification-date">{{ notif.created_at|date:"M d" }}</span>
+                            </div>
+                            <div class="message-preview text-muted">
+                                {{ notif.message|truncatewords:6 }}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </button>
-        </div>
-        {% endfor %}
-    </ul>
-</div>
+                </button>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
 
     <!-- Right: Detailed Notifications -->
 <div class="cards extended">
