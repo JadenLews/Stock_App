@@ -32,7 +32,58 @@ def register(request):
 
 
 def home(request):
-    return render(request, "pages/home.html")
+    eastern = pytz.timezone('US/Eastern')
+    current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
+    current_date = datetime.now(eastern).strftime("%m/%d/%Y")
+    
+    portfolio_stocks = Portfolio.objects.filter(user=request.user)
+
+    # Initialize an empty list to hold stock data
+    portfolio_data = []
+
+    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
+    for entry in portfolio_stocks:
+        stock_symbol = entry.stock.symbol
+        quantity = entry.num_shares
+        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        
+        # Fetch current stock price and previous close price
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        prev_close = stock_info.info['previousClose']
+
+        # Calculate percentage change
+        percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
+
+        # Determine if the stock is up or down based on the percentage change
+        price_change_direction = 'up' if percent_change > 0 else 'down'
+
+        # Append the data for this stock to the stock_data list
+        portfolio_data.append({
+            'symbol': stock_symbol,
+            'company_name': entry.stock.company_name,
+            'current_price': current_price,
+            'percent_change': percent_change,
+            'change_direction': price_change_direction,
+            'stock_quantity':quantity,
+        })
+        
+    notifications = Notification.objects.filter(user=request.user, status='unviewed').order_by('-created_at')
+    first_notif = notifications[:5]
+    notification_count = notifications.count()
+    
+
+
+    # Pass the stock data to the template
+    context = {
+        'markets': portfolio_data,
+        'time': current_time,
+        'date': current_date,
+        'notifications': notifications,
+        'notif_count': notification_count,
+        'top_notif': first_notif,
+    }
+
+    return render(request, "pages/home.html", context)
 
 @login_required
 def notifications(request, notification_id=None):
@@ -207,10 +258,16 @@ def user_watchlist(request):
             'percent_change': percent_change,
             'change_direction': price_change_direction
         })
+    
+    eastern = pytz.timezone('US/Eastern')
+    current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
+    current_date = datetime.now(eastern).strftime("%m/%d/%Y")
 
     # Pass the stock data to the template
     context = {
         'watchlist': stock_data,
+        'time': current_time,
+        'date': current_date,
     }
     
     return render(request, 'pages/watchlist.html', context)
@@ -265,6 +322,35 @@ def execute_trade(request):
             portfolio_item.save()
 
             messages.success(request, f'Trade executed: {trade_action.capitalize()} {quantity} shares of {stock_symbol}')
+        except Stock.DoesNotExist:
+            messages.error(request, 'Stock not found.')
+        except Exception as e:
+            messages.error(request, f'Error executing trade: {e}')
+        
+        # Redirect back to the stock details page or wherever you want
+        return redirect('stock_details', symbol=stock_symbol)
+    
+@login_required
+def add_watchlist(request):
+    if request.method == 'POST':
+        stock_symbol = request.POST.get('stock_symbol')
+
+        try:
+            # Fetch the stock object
+            stock = Stock.objects.get(symbol=stock_symbol)
+
+            # Check if a Watchlist entry already exists for the user and the stock
+            if not Watchlist.objects.filter(user=request.user, stock=stock).exists():
+                # If it doesn't exist, create the watchlist item
+                Watchlist.objects.create(
+                    user=request.user,
+                    stock=stock,
+                )
+                messages.success(request, f'Added {stock_symbol} to your watchlist.')
+            else:
+                # If it already exists, do nothing
+                messages.info(request, f'{stock_symbol} is already in your watchlist.')
+
         except Stock.DoesNotExist:
             messages.error(request, 'Stock not found.')
         except Exception as e:

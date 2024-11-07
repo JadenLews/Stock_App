@@ -1,0 +1,199 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.backyground {
+    background-color: #1c1c28;
+}
+
+.container {
+    background-color: #464646;
+    display: flex; /* Use flexbox for the layout */
+}
+
+/* Markets Container */
+.markets-container {
+    margin-top: 50px;
+    width: 300px;
+    border: 1px solid #000000;
+    background-color: #3e3e50;
+    border-radius: 6px;
+    margin: 20px;
+}
+
+/* Notifications Container */
+.notif-container {
+    margin-top: 50px;
+    width: 300px;
+    border: 1px solid #000000;
+    background-color: #3e3e50;
+    border-radius: 6px;
+    margin: 20px;
+}
+
+.markets-card {
+    width: 100%;
+}
+
+.notif-card {
+    width: 100%;
+}
+
+.Markets_Header {
+    color: #FFFFFF;
+    margin: 10px;
+    font-size: 18px;
+}
+
+.Notif_Header {
+    color: #FFFFFF;
+    margin: 10px;
+    font-size: 18px;
+}
+
+.notification-count-text {
+    font-size: 14px;  /* Adjust the size as needed */
+}
+
+/* Stock button styling */
+.stock_button {
+    border-top: 1px solid #ccc !important;
+    border-radius: 0px !important;
+    height: 60px;
+    background-color: #3e3e50;  /* Default background color */
+    color: white;  /* Default text color */
+    padding: 0;  /* Adjust padding if needed */
+    border: none; /* Remove any visible border that could interfere */
+}
+
+.stock_button.selected {
+    background-color: #292936;  /* Background color when selected */
+    color: white;  /* Ensure the text is white or your preferred color */
+    border: none; /* Ensure no extra borders are interfering */
+}
+
+.stock_button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+    color: white;  /* Text color on hover */
+    border: none; /* Remove any border interference */
+}
+
+.stock-pricing {
+    text-align: right;
+    padding-right: 8px;
+}
+
+.stock-price {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.turn-white {
+    color: #FFFFFF;
+}
+
+.price-change {
+    font-size: 14px;
+}
+
+.stock-details {
+    padding-left: 5px;
+}
+
+.stock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left; /* Ensures the text aligns to the left */
+    margin-left: 5px; /* Adds some space to the left of the name */
+    flex-grow: 1; /* This ensures it takes up available space */
+}
+
+.notif-text {
+    color: #a5a5a5;
+    font-size: 12px;
+    text-align: left; /* Ensures the text aligns to the left */
+    margin-left: 5px; /* Adds some space to the left of the name */
+    flex-grow: 1; /* This ensures it takes up available space */
+}
+
+.notif-info {
+    white-space: normal;  /* Allow the text to wrap */
+    word-wrap: break-word; /* Ensure long words break and don't overflow */
+    word-break: break-word; /* Break long words if needed */
+}
+
+/* Card Styles */
+.watchlist-card, .markets-card, .portfolio-card {
+    border-radius: 10px; /* Smooth rounded corners */
+}
+
+.watchlist-card, .markets-card, .portfolio-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Market Item Containers */
+.markets-item-container:last-child {
+    border-bottom-left-radius: 6px !important;  /* Match the container's rounding */
+    border-bottom-right-radius: 6px !important; /* Match the container's rounding */
+    overflow: hidden !important; /* Prevent overflow beyond the container */
+}
+
+/* Notification Item Containers */
+.notif-item-container {
+    border-top: 1px solid #ccc !important;  /* Add white separator */
+}
+
+.notif-item-container:last-child {
+    border-bottom-left-radius: 6px !important;  /* Match the container's rounding */
+    border-bottom-right-radius: 6px !important; /* Match the container's rounding */
+    overflow: hidden !important; /* Prevent overflow beyond the container */
+}
+
+.notif-item-container .notifstock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 5px;
+    flex-grow: 1;
+}
+
+.notif-item-container .stock-pricing {
+    text-align: right;
+    padding-right: 8px;
+}
+
+.notif-item-container .stock-price {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.notif-item-container .price-change {
+    font-size: 14px;
+}
+
+.star-button.selected {
+    background-color: #292936;  /* Background color for selected star */
+    border: none; /* Ensure no borders interfere with the background */
+}
+
+.star-button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+}
+
+.stock_button.selected:hover {
+    background-color: #292936; /* Your custom hover color while clicked */
+}
+
+.stock_button, .star-button {
+    outline: none;
+    box-shadow: none;  /* Removes any shadow effect */
+}
+
+.stock_button, .star-button {
+    transition: background-color 0.3s ease, color 0.3s ease; /* You can adjust the time and effect */
+}

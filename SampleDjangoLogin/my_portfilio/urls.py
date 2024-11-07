@@ -30,7 +30,9 @@ urlpatterns = [
     path('watchlist/', user_views.user_watchlist, name='user_watchlist'),
     path("notifications/", user_views.notifications, name='notifications'),
     path('stock/<str:symbol>/', user_views.stock_details, name='stock_details'),
+    path('watchlist/toggle/<str:symbol>/', user_views.toggle_watchlist, name='toggle_watchlist'),
     path('trade/execute/', user_views.execute_trade, name='execute_trade'),
+    path('trade/addwatchlist/', user_views.add_watchlist, name='add_watchlist'),
     path('notifications/', user_views.notifications, name='notifications'),
     path('notifications/<int:notification_id>/', user_views.notifications, name='notification_detail'),
  ]

@@ -152,8 +152,18 @@ body, html {
 }
 
 .stock-details {
-    padding-right: 5px;
+    padding-left: 5px
 }
+
+.stock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left; /* Ensures the text aligns to the left */
+    margin-left: 5px; /* Adds some space to the left of the name */
+    flex-grow: 1; /* This ensures it takes up available space */
+}
+
 
 .watchlist-card, .search-bar, .btn, .markets-card, .portfolio-card {
     border-radius: 10px; /* Smooth rounded corners */

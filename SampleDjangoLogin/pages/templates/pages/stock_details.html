@@ -1,7 +1,9 @@
 {% extends "base.html" %}
+
 {% block page_content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/stock_details.css' %}">
+
 <div class="search_results">
     {% if error %}
         <div class="alert alert-danger" role="alert">{{ error }}</div>
@@ -10,73 +12,83 @@
             <div class="card-header">
                 <span id="buyAction" class="action-item buy">Buy</span>
                 <span id="sellAction" class="action-item sell">Sell</span>
-              </div>
+            </div>
             <div class="card-body">
                 <!-- Stock symbol and price -->
                 <div class="stock_symbol d-flex flex-column justify-content-center align-items-center">
-                    <h1 class="stock-display stockticker">{{ stock.symbol| upper }}</h1>
+                    <h1 class="stock-display stockticker">{{ stock.symbol|upper }}</h1>
                     <label class="labelcurrent stockdisplay2" for="currentPrice">Market Price:</label>
-                    <h1 class="stock-display stockdisplay2">${{ stock.price|floatformat:2}}</h1>
+                    <h1 class="stock-display stockdisplay2">${{ stock.price|floatformat:2 }}</h1>
                 </div>
 
                 <form method="POST" action="{% url 'execute_trade' %}">
                     {% csrf_token %}
-                     <!-- Stock Symbol (Hidden Input) -->
+                    <!-- Stock Symbol (Hidden Input) -->
                     <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
+
                     <!-- Action (Buy/Sell) Hidden Input -->
                     <input type="hidden" name="trade_action" id="tradeAction" value="buy"> <!-- Default to buy -->
-            
-                <!-- Quantity Input -->
-                <div class="quantity d-flex flex-column justify-content-center align-items-center">
-                    <label for="quantity" class="form-label">Shares:</label>
-                    <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1">
-                </div>
+                    
+                    <!-- Quantity Input -->
+                    <div class="quantity d-flex flex-column justify-content-center align-items-center">
+                        <label for="quantity" class="form-label">Shares:</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1">
+                    </div>
 
-                <!-- Total Price -->
-                <div class="total_price d-flex flex-column justify-content-center align-items-center">
-                    <label class="labelcurrent" for="totalPrice">Total Price:</label>
-                    <input type="text" class="stock-display" id="totalPrice" value="${{stock.price|floatformat:2}}" readonly>
-                </div>
+                    <!-- Total Price -->
+                    <div class="total_price d-flex flex-column justify-content-center align-items-center">
+                        <label class="labelcurrent" for="totalPrice">Total Price:</label>
+                        <input type="text" class="stock-display" id="totalPrice" value="${{ stock.price|floatformat:2 }}" readonly>
+                    </div>
 
-                <script>
-                    // Update total price when quantity changes
-                    document.getElementById('quantity').addEventListener('input', function () {
-                        const quantity = parseFloat(this.value) || 0;
-                        const price = parseFloat("{{ stock.price }}");
-                        const totalPrice = quantity * price;
-                        document.getElementById('totalPrice').value = `$${totalPrice.toFixed(2)}`;
-                    });
+                    <script>
+                        // Update total price when quantity changes
+                        document.getElementById('quantity').addEventListener('input', function () {
+                            const quantity = parseFloat(this.value) || 0;
+                            const price = parseFloat("{{ stock.price }}");
+                            const totalPrice = quantity * price;
+                            document.getElementById('totalPrice').value = `$${totalPrice.toFixed(2)}`;
+                        });
 
-                    // Function to resize the input based on the input length
-                    const inputField = document.getElementById('quantity');
-                    inputField.addEventListener('input', function () {
-                        const inputLength = this.value.length;
-                        this.style.width = (inputLength + 1) * 15 + 'px'; // Adjusts based on the number of characters
-                    });
+                        // Function to resize the input based on the input length
+                        const inputField = document.getElementById('quantity');
+                        inputField.addEventListener('input', function () {
+                            const inputLength = this.value.length;
+                            this.style.width = (inputLength + 1) * 15 + 'px'; // Adjusts based on the number of characters
+                        });
 
-                    // Handle action toggle for Buy/Sell
-    document.getElementById('buyAction').addEventListener('click', function () {
-        document.getElementById('tradeAction').value = 'buy';
-        toggleActiveAction('buyAction', 'sellAction');
-    });
+                        // Handle action toggle for Buy/Sell
+                        document.getElementById('buyAction').addEventListener('click', function () {
+                            document.getElementById('tradeAction').value = 'buy';
+                            toggleActiveAction('buyAction', 'sellAction');
+                        });
 
-    document.getElementById('sellAction').addEventListener('click', function () {
-        document.getElementById('tradeAction').value = 'sell';
-        toggleActiveAction('sellAction', 'buyAction');
-    });
+                        document.getElementById('sellAction').addEventListener('click', function () {
+                            document.getElementById('tradeAction').value = 'sell';
+                            toggleActiveAction('sellAction', 'buyAction');
+                        });
 
-    // Function to toggle the active class
-    function toggleActiveAction(activeId, inactiveId) {
-        document.getElementById(activeId).classList.add('active-action');
-        document.getElementById(inactiveId).classList.remove('active-action');
-    }
-                </script>
+                        // Function to toggle the active class
+                        function toggleActiveAction(activeId, inactiveId) {
+                            document.getElementById(activeId).classList.add('active-action');
+                            document.getElementById(inactiveId).classList.remove('active-action');
+                        }
+                    </script>
 
-                <!-- Execute Trade Button -->
-                <button type="submit" class="custom-btn">Execute Trade</button>
-            </form>
+                    <!-- Execute Trade Button -->
+                    <button type="submit" class="custom-btn">Execute Trade</button>
+                </form>
+                <form method="POST" action="{% url 'add_watchlist' %}">
+                    {% csrf_token %}
+                    <!-- Stock Symbol (Hidden Input) -->
+                    <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
+
+                    <!-- Execute Trade Button -->
+                    <button type="submit" class="custom-btn">Add to Watchlist</button>
+                </form>
             </div>
         </div>
     {% endif %}
 </div>
+
 {% endblock %}

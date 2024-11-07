@@ -1,12 +1,101 @@
 {% extends "base.html" %}
 
 {% block page_content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
 <div class="homewholepage">
     {% if user.is_authenticated %}
     <div class="alert alert-success" role="alert">
         <h3>Welcome {{ user.first_name }}!</h3>
         <a href="{% url 'logout' %}">Logout</a>
     </div>
+    <div class="turn-white">
+        <h5>Updated: {{ time }} ET, {{ date }} 
+            <a href="{% url 'home' %}"> 
+                <button>↻</button>
+            </a>
+        </h5>
+    </div>
+    <div class="markets-container">
+        <div class="markets-card">
+            <div class="card-header">
+                <h4 class="Markets_Header">Markets</h4>
+            </div>
+            {% if markets %}
+                <ul class="list-unstyled">
+                    {% for stock in markets %}
+                        <div class="markets-item-container d-flex align-items-center">
+                            <button type="button" class="btn stock_button flex-grow-1">
+                                <div class="markets-item d-flex justify-content-between align-items-center">
+                                    <div class="stock-pricing text-end">
+                                        <div class="stock-name">
+                                            <span class="marketstock-name">{{ stock.symbol |upper }}</span>
+                                        </div>
+                                        <div class="stock-name">
+                                            <span class="marketstock-name">({{ stock.company_name |upper }})</span>
+                                        </div>
+                                    </div>
+                                    <div class="stock-pricing text-end">
+                                        <div class="stock-price">${{ stock.current_price }}</div>
+                                        <div class="price-change {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
+                                            {{ stock.percent_change }}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have no stocks in your markets.</p>
+            {% endif %}
+        </div>
+    </div> <!-- End of markets-container -->
+    <div class="notif-container">
+        <div class="notif-card">
+            <div class="card-header">
+                <h4 class="Notif_Header">Quick Notifications</h4>
+            </div>
+            <div class="card-header">
+                <h2 class="Notif_Header notification-count-text">
+                    {% if notif_count == 1 %}
+                        You have 1 Unviewed Notification.<br>
+                        Here is the Most Recent.<br>
+                    {% elif notif_count > 1 %}
+                        You have {{ notif_count }} Unviewed Notifications.<br>
+                        Here are the Most Recent.<br>
+                    {% else %}
+                        You have 0 Unviewed Notifications.
+                    {% endif %}
+                </h2>
+            </div>
+            {% if top_notif %}
+                <ul class="list-unstyled">
+                    {% for notif in top_notif %}
+                        <div class="notif-item-container d-flex flex-column align-items-start">
+                            <div class="markets-item d-flex flex-column align-items-start">
+                                <span class="notifstock-name">
+                                    {{ notif.stock.company_name | upper }} ({{ notif.stock.symbol | upper }})
+                                </span>
+                                <div class="notif-text">
+                                    <span class="notif-info">
+                                        {% if notif.message|length > 100 %}
+                                            {{ notif.message|slice:":100" }}...
+                                        {% else %}
+                                            {{ notif.message }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            {% else %}
+            {% endif %}
+        </div>
+    </div> <!-- End of markets-container -->
     {% else %}
     <div class="alert alert-success" role="alert">
         <a href="{% url 'register' %}">Signup</a>

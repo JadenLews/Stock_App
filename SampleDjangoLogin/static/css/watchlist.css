@@ -17,6 +17,10 @@ body, html {
     margin: 20px;
 }
 
+.turn-white {
+    color: #FFFFFF;
+}
+
 .list-unstyled {
     margin: 0px;
 }
