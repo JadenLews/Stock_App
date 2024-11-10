@@ -195,36 +195,33 @@ def portfolio(request):
     
     return render(request, "pages/portfolio.html", context)
 
-def stock_details(request, symbol):
-    try:
-        # Use yfinance to get stock info
-        stock_info = yf.Ticker(symbol)
-        stock_price = stock_info.history(period="1d")['Close'].iloc[0] # Fetch current price
-        
-        # Try to get the stock if it exists, or create a new entry
-        stock, created = Stock.objects.get_or_create(
-            symbol=symbol,
-            defaults={
-                'company_name': stock_info.info['longName'],
-                'sector': stock_info.info.get('sector', 'N/A'),
-                'price': stock_price
-            }
-        )
-        
-        if not created:
-            # Update the price if the stock already exists
-            stock.price = stock_price
-            stock.save()
+from django.utils.safestring import mark_safe
 
-        return render(request, 'pages/stock_details.html', {'stock': stock})
+from django.utils.safestring import mark_safe
 
-    except KeyError:
-        return render(request, 'pages/stock_details.html', {'error': 'Invalid stock symbol or missing data from the API.'})
-    except IntegrityError:
-        return render(request, 'pages/stock_details.html', {'error': 'Error saving the stock.'})
-    except IndexError:
-        return render(request, 'pages/stock_details.html', {'error': 'Invalid stock symbol or missing data from the API.'})
-
+def stock_details(request, symbol, time_frame='1mo'):
+    stock = yf.Ticker(symbol)
+    stock_info = stock.history(period=time_frame, interval="1d")
+    
+    # Extract dates and closing prices
+    dates = stock_info.index.strftime("%Y-%m-%d").tolist()
+    closing_prices = stock_info['Close'].tolist()
+    
+    # Fetch the company name from the stock info
+    company_name = stock.info.get('shortName', 'N/A')  # 'N/A' if the name is not available
+    
+    context = {
+        'stock': {
+            'symbol': symbol,
+            'company_name': company_name,  # Add company name here
+            'price': round(stock_info['Close'].iloc[-1], 2),
+        },
+        'symbol': symbol,
+        'time_frame': time_frame,  # Pass current time frame to template
+        'dates': mark_safe(json.dumps(dates)),
+        'closing_prices': mark_safe(json.dumps(closing_prices)),
+    }
+    return render(request, 'pages/stock_details.html', context)
 
 
 @login_required
