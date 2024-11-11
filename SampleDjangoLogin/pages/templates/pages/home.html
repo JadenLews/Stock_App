@@ -7,9 +7,9 @@
 
 <div class="homewholepage">
     {% if user.is_authenticated %}
-    <div class="alert alert-success" role="alert">
-        <h3>Welcome {{ user.first_name }}!</h3>
-        <a href="{% url 'logout' %}">Logout</a>
+    <div class="welcome" role="alert">
+        <h3 class="welcome_text">Welcome {{ user.first_name }}!</h3>
+        <a class="welcome_text" href="{% url 'logout' %}">Logout</a>
     </div>
     <div class="turn-white">
         <h5>Updated: {{ time }} ET, {{ date }} 

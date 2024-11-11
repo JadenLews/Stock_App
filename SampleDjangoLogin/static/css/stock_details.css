@@ -112,6 +112,22 @@ body, html {
     display: block;
 }
 
+.addtowatch {
+    width: 75px;
+    background-color: #1c1c28;
+    color: white;
+    border: none;
+    margin-right: 10px !important;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    margin: 15px auto;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    text-align: center;
+}
+
 .custom-btn:hover {
     background-color: #45a049;
 }

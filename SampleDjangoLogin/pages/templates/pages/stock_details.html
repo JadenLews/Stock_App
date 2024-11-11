@@ -18,6 +18,11 @@
             <button class="timeframe-btn {% if time_frame == '1y' %}selected{% endif %}" onclick="window.location.href = '{% url 'stock_details_with_time_frame' symbol '1y' %}'">1Y</button>
             <button class="timeframe-btn {% if time_frame == '5y' %}selected{% endif %}" onclick="window.location.href = '{% url 'stock_details_with_time_frame' symbol '5y' %}'">5Y</button>
         </div>
+        <form method="POST" action="{% url 'add_watchlist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
+            <button type="submit" class="addtowatch">Add to Watchlist</button>
+        </form>
     
         <!-- Chart Section -->
         <div class="chart-container">
@@ -58,12 +63,6 @@
                         </div>
 
                         <button type="submit" class="custom-btn">Execute Trade</button>
-                    </form>
-
-                    <form method="POST" action="{% url 'add_watchlist' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
-                        <button type="submit" class="custom-btn">Add to Watchlist</button>
                     </form>
                 </div>
             </div>
@@ -208,13 +207,13 @@
 .chart-container {
     height: 100%;  
     max-height: 500px;
-    min-height: 300px;
     overflow: hidden;
     display: flex;
     align-items: center; 
     padding: 0px 10px;
     box-sizing: border-box;
     margin: 0px;
+    min-height: 400px;
 }
 
 .color_me {

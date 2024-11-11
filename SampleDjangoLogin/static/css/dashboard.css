@@ -197,3 +197,12 @@ body, html {
 .stock_button, .star-button {
     transition: background-color 0.3s ease, color 0.3s ease; /* You can adjust the time and effect */
 }
+
+.welcome {
+    z-index: 5;
+    width: 100%;
+}
+.welcome_text {
+    text-align: center;
+    color: #FFFFFF;
+}
