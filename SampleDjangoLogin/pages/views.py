@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from datetime import datetime
 import pytz
 
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -197,19 +198,30 @@ def portfolio(request):
 
 from django.utils.safestring import mark_safe
 
-from django.utils.safestring import mark_safe
 
 def stock_details(request, symbol, time_frame='1mo'):
     stock = yf.Ticker(symbol)
-    stock_info = stock.history(period=time_frame, interval="1d")
+    
+    # Set the default interval
+    interval = "1d"
+    
+    # Adjust the interval based on the time_frame provided
+    if time_frame == "1d":
+        interval = "15m"
+    elif time_frame == "5d":
+        interval = "30m"
+    
+    # Fetch historical stock data with the adjusted interval
+    stock_info = stock.history(period=time_frame, interval=interval)
     
     # Extract dates and closing prices
-    dates = stock_info.index.strftime("%Y-%m-%d").tolist()
+    dates = stock_info.index.strftime("%Y-%m-%d %H:%M").tolist() if interval != "1d" else stock_info.index.strftime("%Y-%m-%d").tolist()
     closing_prices = stock_info['Close'].tolist()
     
     # Fetch the company name from the stock info
     company_name = stock.info.get('shortName', 'N/A')  # 'N/A' if the name is not available
-    
+    print("Dates:", dates)
+    print("Closing Prices:", closing_prices)
     context = {
         'stock': {
             'symbol': symbol,
@@ -221,6 +233,7 @@ def stock_details(request, symbol, time_frame='1mo'):
         'dates': mark_safe(json.dumps(dates)),
         'closing_prices': mark_safe(json.dumps(closing_prices)),
     }
+    
     return render(request, 'pages/stock_details.html', context)
 
 
