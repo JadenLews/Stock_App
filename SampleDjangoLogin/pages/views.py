@@ -222,6 +222,17 @@ def stock_details(request, symbol, time_frame='1mo'):
     company_name = stock.info.get('shortName', 'N/A')  # 'N/A' if the name is not available
     print("Dates:", dates)
     print("Closing Prices:", closing_prices)
+    
+    
+    stock_item, created = Stock.objects.get_or_create(
+    symbol=symbol,
+    defaults={
+        'company_name': company_name,
+        'sector': stock.info.get("sector", "N/A"),
+        'price': round(stock_info['Close'].iloc[-1], 2)
+    }
+)
+    
     context = {
         'stock': {
             'symbol': symbol,
@@ -308,6 +319,7 @@ def execute_trade(request):
 
         try:
             # Fetch the stock object
+            
             stock = Stock.objects.get(symbol=stock_symbol)
             
             # Convert quantity to a decimal
