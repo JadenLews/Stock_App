@@ -18,6 +18,7 @@
             <button class="timeframe-btn {% if time_frame == '1y' %}selected{% endif %}" onclick="window.location.href = '{% url 'stock_details_with_time_frame' symbol '1y' %}'">1Y</button>
             <button class="timeframe-btn {% if time_frame == '5y' %}selected{% endif %}" onclick="window.location.href = '{% url 'stock_details_with_time_frame' symbol '5y' %}'">5Y</button>
         </div>
+        
         <form method="POST" action="{% url 'add_watchlist' %}">
             {% csrf_token %}
             <input type="hidden" name="stock_symbol" value="{{ stock.symbol }}">
@@ -26,7 +27,11 @@
     
         <!-- Chart Section -->
         <div class="chart-container">
-            <canvas id="stockChart"></canvas>
+            {% if error %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% else %}
+                <canvas id="stockChart"></canvas>
+            {% endif %}
         </div>
     </div>
 
@@ -71,69 +76,74 @@
 </div>
 
 <script>
-    const chartLabels = {{ dates|safe }};
-    const chartData = {{ closing_prices|safe }};
+    {% if error %}
+        // If there's an error, don't render the chart.
+        document.querySelector('.chart-container').style.display = 'none';
+    {% else %}
+        const chartLabels = {{ dates|safe }};
+        const chartData = {{ closing_prices|safe }};
 
-    const ctx = document.getElementById('stockChart').getContext('2d');
-    const stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartLabels,
-            datasets: [{
-                label: '{{ stock.company_name|upper }} Stock Price',
-                data: chartData,
-                borderColor: 'rgba(0, 136, 255, 0.8)',
-                backgroundColor: 'rgba(0, 136, 255, 0.1)',
-                fill: true,
-                tension: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { 
-                    title: { display: true, text: 'Date', color: '#cccccc' },  // Light gray for axis title
-                    ticks: { color: '#cccccc' },  // Light gray for tick labels
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' }  // Faint grid lines
-                },
-                y: { 
-                    title: { display: true, text: 'Price (USD)', color: '#cccccc' },  // Light gray for axis title
-                    ticks: { color: '#cccccc' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                }
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '{{ stock.company_name|upper }} Stock Price',
+                    data: chartData,
+                    borderColor: 'rgba(0, 136, 255, 0.8)',
+                    backgroundColor: 'rgba(0, 136, 255, 0.1)',
+                    fill: true,
+                    tension: 0
+                }]
             },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#cccccc',  // Light gray for legend text
-                        font: { size: 14 }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { 
+                        title: { display: true, text: 'Date', color: '#cccccc' },
+                        ticks: { color: '#cccccc' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    y: { 
+                        title: { display: true, text: 'Price (USD)', color: '#cccccc' },
+                        ticks: { color: '#cccccc' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#cccccc',
+                            font: { size: 14 }
+                        }
                     }
                 }
             }
+        });
+
+        document.getElementById('quantity').addEventListener('input', function () {
+            const quantity = parseFloat(this.value) || 0;
+            const price = parseFloat("{{ stock.price }}");
+            const totalPrice = quantity * price;
+            document.getElementById('totalPrice').value = `$${totalPrice.toFixed(2)}`;
+        });
+
+        function toggleActiveAction(activeId, inactiveId) {
+            document.getElementById(activeId).classList.add('active-action');
+            document.getElementById(inactiveId).classList.remove('active-action');
         }
-    });
 
-    document.getElementById('quantity').addEventListener('input', function () {
-        const quantity = parseFloat(this.value) || 0;
-        const price = parseFloat("{{ stock.price }}");
-        const totalPrice = quantity * price;
-        document.getElementById('totalPrice').value = `$${totalPrice.toFixed(2)}`;
-    });
-
-    function toggleActiveAction(activeId, inactiveId) {
-        document.getElementById(activeId).classList.add('active-action');
-        document.getElementById(inactiveId).classList.remove('active-action');
-    }
-
-    document.getElementById('buyAction').addEventListener('click', function () {
-        document.getElementById('tradeAction').value = 'buy';
-        toggleActiveAction('buyAction', 'sellAction');
-    });
-    document.getElementById('sellAction').addEventListener('click', function () {
-        document.getElementById('tradeAction').value = 'sell';
-        toggleActiveAction('sellAction', 'buyAction');
-    });
+        document.getElementById('buyAction').addEventListener('click', function () {
+            document.getElementById('tradeAction').value = 'buy';
+            toggleActiveAction('buyAction', 'sellAction');
+        });
+        document.getElementById('sellAction').addEventListener('click', function () {
+            document.getElementById('tradeAction').value = 'sell';
+            toggleActiveAction('sellAction', 'buyAction');
+        });
+    {% endif %}
 </script>
 
 <style>

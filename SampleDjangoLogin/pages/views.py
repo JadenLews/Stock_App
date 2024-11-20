@@ -5,22 +5,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import UserRegistrationForm 
 import yfinance as yf
-from .models import Stock
-from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required
 from .models import Watchlist, Stock
 from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from datetime import datetime
 import pytz
+from django.core.cache import cache
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
 
 
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            # form.save() will automatically hash the password and save the user.
             form.save()
             messages.success(request, 'Your account has been created. You can log in now!')
             return redirect('login')
@@ -31,7 +31,7 @@ def register(request):
     return render(request, 'pages/register.html', context)
 
 
-
+@login_required
 def home(request):
     eastern = pytz.timezone('US/Eastern')
     current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
@@ -39,67 +39,69 @@ def home(request):
     
     portfolio_stocks = Portfolio.objects.filter(user=request.user)
 
-    # Initialize an empty list to hold stock data
     portfolio_data = []
-
-    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
     for entry in portfolio_stocks:
         stock_symbol = entry.stock.symbol
         quantity = entry.num_shares
-        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
         
-        # Fetch current stock price and previous close price
-        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
-        prev_close = stock_info.info['previousClose']
-
-        # Calculate percentage change
-        percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
-
-        # Determine if the stock is up or down based on the percentage change
-        price_change_direction = 'up' if percent_change > 0 else 'down'
-
-        # Append the data for this stock to the stock_data list
+        # Check if the stock data is cached
+        stock_data = cache.get(f"stock_data_{stock_symbol}")
+        if not stock_data:
+            stock_info = yf.Ticker(stock_symbol)
+            current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
+            prev_close = stock_info.info['previousClose']
+            percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
+            price_change_direction = 'up' if percent_change > 0 else 'down'
+            
+            # Store the fetched data in cache for 5 minutes
+            stock_data = {
+                'current_price': current_price,
+                'percent_change': percent_change,
+                'change_direction': price_change_direction
+            }
+            cache.set(f"stock_data_{stock_symbol}", stock_data, timeout=300)
+        
         portfolio_data.append({
             'symbol': stock_symbol,
             'company_name': entry.stock.company_name,
-            'current_price': current_price,
-            'percent_change': percent_change,
-            'change_direction': price_change_direction,
-            'stock_quantity':quantity,
+            'current_price': stock_data['current_price'],
+            'percent_change': stock_data['percent_change'],
+            'change_direction': stock_data['change_direction'],
+            'stock_quantity': quantity,
         })
-        
+
     notifications = Notification.objects.filter(user=request.user, status='unviewed').order_by('-created_at')
-    first_notif = notifications[:5]
-    notification_count = notifications.count()
-    
+    paginator = Paginator(notifications, 5)  # Show only 5 notifications per page
+    page = request.GET.get('page')
+    notifications_paginated = paginator.get_page(page)
 
-
-    # Pass the stock data to the template
     context = {
         'markets': portfolio_data,
         'time': current_time,
         'date': current_date,
-        'notifications': notifications,
-        'notif_count': notification_count,
-        'top_notif': first_notif,
+        'notifications': notifications_paginated,
+        'notif_count': notifications.count(),
+        'top_notif': notifications_paginated,
     }
 
     return render(request, "pages/home.html", context)
 
+
 @login_required
 def notifications(request, notification_id=None):
-    # Fetch all notifications for the logged-in user, ordered by newest first
     user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     
-    # If a specific notification ID is provided, show detailed notifications for that stock
+    # Pagination for notifications
+    paginator = Paginator(user_notifications, 5)  # Limit notifications to 5 per page
+    page = request.GET.get('page')
+    notifications_paginated = paginator.get_page(page)
+
     if notification_id:
-        # Update the selected notification status to 'viewed'
         selected_notification = Notification.objects.get(id=notification_id, user=request.user)
         if selected_notification.status == 'unviewed':
             selected_notification.status = 'viewed'
-            selected_notification.save()  # Save the change to mark as viewed
-        
-        # Get all notifications for the same stock symbol
+            selected_notification.save()
+
         detailed_notifications = Notification.objects.filter(
             user=request.user,
             stock__symbol__iexact=selected_notification.stock.symbol
@@ -110,36 +112,28 @@ def notifications(request, notification_id=None):
         selected_notification_id = None
 
     context = {
-        'notifications': user_notifications,
+        'notifications': notifications_paginated,
         'detailed_notifications': detailed_notifications,
         'selected_notification_id': selected_notification_id,
     }
 
     return render(request, "pages/notifications.html", context)
 
-def portfolio(request):
-    # Fetch the watchlist for the current logged-in user
-    user_watchlist = Watchlist.objects.filter(user=request.user)
 
-    # Initialize an empty list to hold stock data
+@login_required
+def portfolio(request):
+    user_watchlist = Watchlist.objects.filter(user=request.user)
     stock_data = []
 
-    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
     for entry in user_watchlist:
-        stock_symbol = entry.stock.symbol  # Get the stock symbol from your model
-        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        stock_symbol = entry.stock.symbol
+        stock_info = yf.Ticker(stock_symbol)
         
-        # Fetch current stock price and previous close price
-        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
         prev_close = stock_info.info['previousClose']
-
-        # Calculate percentage change
         percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
-
-        # Determine if the stock is up or down based on the percentage change
         price_change_direction = 'up' if percent_change > 0 else 'down'
 
-        # Append the data for this stock to the stock_data list
         stock_data.append({
             'symbol': stock_symbol,
             'company_name': entry.stock.company_name,
@@ -147,30 +141,20 @@ def portfolio(request):
             'percent_change': percent_change,
             'change_direction': price_change_direction
         })
-        
-    # Fetch the watchlist for the current logged-in user
+    
     portfolio_stocks = Portfolio.objects.filter(user=request.user)
-
-    # Initialize an empty list to hold stock data
     portfolio_data = []
 
-    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
     for entry in portfolio_stocks:
         stock_symbol = entry.stock.symbol
         stock_quantity = entry.num_shares
-        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        stock_info = yf.Ticker(stock_symbol)
         
-        # Fetch current stock price and previous close price
-        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
         prev_close = stock_info.info['previousClose']
-
-        # Calculate percentage change
         percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
-
-        # Determine if the stock is up or down based on the percentage change
         price_change_direction = 'up' if percent_change > 0 else 'down'
 
-        # Append the data for this stock to the stock_data list
         portfolio_data.append({
             'symbol': stock_symbol,
             'company_name': entry.stock.company_name,
@@ -178,15 +162,14 @@ def portfolio(request):
             'current_price': current_price,
             'percent_change': percent_change,
             'change_direction': price_change_direction,
-            'total_value' : float(stock_quantity) * float(current_price),
-            'value_lost' : (float(percent_change) / 100) * (float(stock_quantity) * float(current_price))
+            'total_value': float(stock_quantity) * float(current_price),
+            'value_lost': (float(percent_change) / 100) * (float(stock_quantity) * float(current_price))
         })
+
     eastern = pytz.timezone('US/Eastern')
     current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
     current_date = datetime.now(eastern).strftime("%m/%d/%Y")
 
-
-    # Pass the stock data to the template
     context = {
         'watchlist': stock_data,
         'markets': portfolio_data,
@@ -196,82 +179,83 @@ def portfolio(request):
     
     return render(request, "pages/portfolio.html", context)
 
-from django.utils.safestring import mark_safe
-
 
 def stock_details(request, symbol, time_frame='1mo'):
+    # Initialize the stock object using yfinance
     stock = yf.Ticker(symbol)
     
-    # Set the default interval
+    # Set the interval based on the selected time frame
     interval = "1d"
-    
-    # Adjust the interval based on the time_frame provided
     if time_frame == "1d":
         interval = "15m"
     elif time_frame == "5d":
         interval = "30m"
     
-    # Fetch historical stock data with the adjusted interval
-    stock_info = stock.history(period=time_frame, interval=interval)
+    # Check if the stock data is cached
+    stock_data_cache_key = f"stock_data_{symbol}_{time_frame}"
+    stock_info = cache.get(stock_data_cache_key)
+    print(stock_info)
     
-    # Extract dates and closing prices
+    if stock_info is None or stock_info.empty:
+        print("You Made It Here!")
+        # Fetch the stock data if it's not cached or if the cached data is empty
+        stock_info = stock.history(period=time_frame, interval=interval)
+        
+        # Handle case when stock_info is empty (e.g., no data for the requested period)
+        if stock_info.empty:
+            return render(request, 'pages/stock_details.html', {'error': 'No data available for this time period.'})
+        
+        # Cache the stock data for 10 minutes
+        cache.set(stock_data_cache_key, stock_info, timeout=600)  # Cache for 10 minutes
+    
+    # Extract dates and closing prices from the stock_info DataFrame
     dates = stock_info.index.strftime("%Y-%m-%d %H:%M").tolist() if interval != "1d" else stock_info.index.strftime("%Y-%m-%d").tolist()
     closing_prices = stock_info['Close'].tolist()
-    
-    # Fetch the company name from the stock info
-    company_name = stock.info.get('shortName', 'N/A')  # 'N/A' if the name is not available
-    print("Dates:", dates)
-    print("Closing Prices:", closing_prices)
-    
-    
+
+    # Get the company name and other stock information from yfinance
+    company_name = stock.info.get('shortName', 'N/A')
+
+    # Get or create the Stock record in your database
     stock_item, created = Stock.objects.get_or_create(
-    symbol=symbol,
-    defaults={
-        'company_name': company_name,
-        'sector': stock.info.get("sector", "N/A"),
-        'price': round(stock_info['Close'].iloc[-1], 2)
-    }
-)
-    
+        symbol=symbol,
+        defaults={
+            'company_name': company_name,
+            'sector': stock.info.get("sector", "N/A"),
+            'price': round(stock_info['Close'].iloc[-1], 2) if not stock_info.empty else None
+        }
+    )
+
+    # Prepare context data to pass to the template
     context = {
         'stock': {
             'symbol': symbol,
-            'company_name': company_name,  # Add company name here
-            'price': round(stock_info['Close'].iloc[-1], 2),
+            'company_name': company_name,
+            'price': round(stock_info['Close'].iloc[-1], 2) if not stock_info.empty else None,
         },
         'symbol': symbol,
-        'time_frame': time_frame,  # Pass current time frame to template
-        'dates': mark_safe(json.dumps(dates)),
-        'closing_prices': mark_safe(json.dumps(closing_prices)),
+        'time_frame': time_frame,
+        'dates': json.dumps(dates),
+        'closing_prices': json.dumps(closing_prices),
     }
-    
+
+    # Return the rendered response
     return render(request, 'pages/stock_details.html', context)
 
 
 @login_required
 def user_watchlist(request):
-    # Fetch the watchlist for the current logged-in user
     user_watchlist = Watchlist.objects.filter(user=request.user)
-
-    # Initialize an empty list to hold stock data
     stock_data = []
 
-    # Loop through the user's watchlist and fetch stock data from Yahoo Finance
     for entry in user_watchlist:
-        stock_symbol = entry.stock.symbol  # Get the stock symbol from your model
-        stock_info = yf.Ticker(stock_symbol)  # Fetch data for the stock using Yahoo Finance
+        stock_symbol = entry.stock.symbol
+        stock_info = yf.Ticker(stock_symbol)
         
-        # Fetch current stock price and previous close price
-        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)  # Round to 2 decimals
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
         prev_close = stock_info.info['previousClose']
-
-        # Calculate percentage change
         percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
-
-        # Determine if the stock is up or down based on the percentage change
         price_change_direction = 'up' if percent_change > 0 else 'down'
 
-        # Append the data for this stock to the stock_data list
         stock_data.append({
             'symbol': stock_symbol,
             'company_name': entry.stock.company_name,
@@ -280,18 +264,12 @@ def user_watchlist(request):
             'change_direction': price_change_direction
         })
     
-    eastern = pytz.timezone('US/Eastern')
-    current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
-    current_date = datetime.now(eastern).strftime("%m/%d/%Y")
-
-    # Pass the stock data to the template
     context = {
-        'watchlist': stock_data,
-        'time': current_time,
-        'date': current_date,
+        'watchlist': stock_data
     }
     
     return render(request, 'pages/watchlist.html', context)
+
 @login_required
 @require_POST
 def toggle_watchlist(request, symbol):
