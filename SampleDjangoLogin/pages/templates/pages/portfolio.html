@@ -51,9 +51,6 @@
                 {% endif %}
             </div>
         </div>
-
-        <!-- Insert Chart Here -->
-         
     </div>
 
     <div class="float-end">
@@ -70,7 +67,7 @@
                                 <button type="button" class="star-button" data-stock-symbol="{{ stock.symbol }}">
                                     <span class="star-icon {% if stock.symbol in watchlist %}active{% endif %}">&#9733;</span>
                                 </button>
-                                
+                                  
                                 <!-- Right: Stock Button (stock details) -->
                                 <button type="button" class="btn stock_button flex-grow-1" data-url="/stock/{{ stock.symbol | lower }}/">
                                     <div class="watchlist-item d-flex justify-content-between align-items-center">
@@ -96,6 +93,62 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Insert Pie Chart Here -->
+        <div class="pie-chart-container" style="width: 100%; height: 400px;">
+            <canvas id="sectorPieChart"></canvas>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Debugging: Log the sectorCount data to the console
+                const sectorCount = {{ sector_count | safe }};
+                console.log('Sector Count:', sectorCount); // Check the sector_count dictionary
+
+                // Ensure the canvas element is correctly loaded
+                const ctx = document.getElementById('sectorPieChart');
+                console.log('Canvas Element:', ctx);  // Check if the canvas is correctly selected
+
+                // Check if sectorCount is valid
+                if (sectorCount && Object.keys(sectorCount).length > 0) {
+                    const sectorLabels = Object.keys(sectorCount); 
+                    console.log('Keys', sectorLabels); // Sector names
+                    const sectorValues = Object.values(sectorCount);
+                    console.log('Values', sectorValues);  // Quantities
+
+                    const sectorPieChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: sectorLabels,
+                            datasets: [{
+                                label: 'Stock Sector Distribution',
+                                data: sectorValues,
+                                backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF9633'],  // Customize colors
+                                borderColor: '#ffffff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            return tooltipItem.label + ': ' + tooltipItem.raw + ' stocks';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Invalid sectorCount data or no data available');
+                }
+            });
+        </script>
 
         <!-- JavaScript for button behavior -->
         <script>
@@ -170,6 +223,10 @@
 
 {% block scripts %}
 <!-- JavaScript for button behavior -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.3.1/decimal.min.js"></script>
+
+
 {% endblock %}
 
 {% endblock %}

@@ -10,11 +10,14 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from datetime import datetime
+from django.utils import timezone
+from datetime import timedelta
 import pytz
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
+
 
 
 def register(request):
@@ -144,21 +147,75 @@ def portfolio(request):
     
     portfolio_stocks = Portfolio.objects.filter(user=request.user)
     portfolio_data = []
+    sector_count = {}
+    
 
     for entry in portfolio_stocks:
         stock_symbol = entry.stock.symbol
         stock_quantity = entry.num_shares
         stock_info = yf.Ticker(stock_symbol)
+        sector = stock_info.info.get('sector', 'N/A')
         
         current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
         prev_close = stock_info.info['previousClose']
         percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
         price_change_direction = 'up' if percent_change > 0 else 'down'
+        
+        if percent_change < -4:
+            stock_notifs = Notification.objects.filter(stock=entry.stock)
+            notif_count = 0
+
+            # Get the current UTC time
+            current_time = timezone.now()
+            print(entry.stock.symbol)
+
+            for notif in stock_notifs:
+                # Check if created_at and current_time are on the same date
+                if notif.created_at.date() == current_time.date():
+                    notif_count += 1
+                    
+            if notif_count == 0:
+                Notification.objects.create(
+                message=f"Stock has fallen very low to {percent_change}%", 
+                user=request.user, 
+                stock=entry.stock,
+                status='unviewed', 
+                created_at=current_time
+            )
+                
+        if percent_change > 4:
+            stock_notifs = Notification.objects.filter(stock=entry.stock)
+            notif_count = 0
+
+            # Get the current UTC time
+            current_time = timezone.now()
+            print(entry.stock.symbol)
+
+            for notif in stock_notifs:
+                # Check if created_at and current_time are on the same date
+                if notif.created_at.date() == current_time.date():
+                    notif_count += 1
+                    
+            if notif_count == 0:
+                Notification.objects.create(
+                message=f"Stock has risen very high to {percent_change}%", 
+                user=request.user, 
+                stock=entry.stock,
+                status='unviewed', 
+                created_at=current_time
+            )
+        
+        if sector in sector_count:
+            sector_count[sector] += 1 * int(stock_quantity)
+        else:
+            sector_count[sector] = 1 * int(stock_quantity)
+        
 
         portfolio_data.append({
             'symbol': stock_symbol,
             'company_name': entry.stock.company_name,
             'quantity': stock_quantity,
+            'sector': sector,
             'current_price': current_price,
             'percent_change': percent_change,
             'change_direction': price_change_direction,
@@ -175,6 +232,7 @@ def portfolio(request):
         'markets': portfolio_data,
         'time': current_time,
         'date': current_date,
+        'sector_count': sector_count
     }
     
     return render(request, "pages/portfolio.html", context)
