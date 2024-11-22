@@ -87,3 +87,150 @@
     outline: none;
     box-shadow: 0 2px 6px rgba(28, 28, 40, 0.8);  /* Darker shadow on focus */
 }
+
+
+
+
+
+
+
+
+body, html {
+    margin: 0;
+    padding: 0;
+}
+.backyground {
+    background-color: #1c1c28;
+}
+.container {
+    background-color: #464646;
+}
+.watchlist-container {
+    margin-top: 50px;
+    width: 300px;
+    border: 1px solid #000000;
+    background-color: #3e3e50;
+    border-radius: 6px;
+    margin: 20px;
+}
+
+.turn-white {
+    color: #FFFFFF;
+}
+
+.list-unstyled {
+    margin: 0px;
+}
+
+.Watchlist_Header{
+    color: #FFFFFF;
+    margin: 10px;
+    font-size: 18px;
+}
+
+.star-button {
+    position: relative;
+    background-color: #3e3e50;
+    left: 1px;
+    border: none;
+    border-top: 1px solid #ccc !important;
+    width: 40px;
+    height: 60px;
+    margin-right: 0px;
+}
+
+.star-icon {
+    font-size: 20px;
+    color: gold;
+}
+
+.star-icon.active {
+    color: yellow;
+}
+
+/* Stock button styling */
+/* Default stock button */
+.stock_button {
+    border-top: 1px solid #ccc !important;
+    border-radius: 0px !important;
+    height: 60px;
+    background-color: #3e3e50;  /* Default background color */
+    color: white;  /* Default text color */
+    padding: 0;  /* Adjust padding if needed */
+    border: none; /* Remove any visible border that could interfere */
+}
+
+/* When the stock button is selected */
+.stock_button.selected {
+    background-color: #292936;  /* Background color when selected */
+    color: white;  /* Ensure the text is white or your preferred color */
+    border: none; /* Ensure no extra borders are interfering */
+}
+
+/* Star button when selected */
+.star-button.selected {
+    background-color: #292936;  /* Background color for selected star */
+    border: none; /* Ensure no borders interfere with the background */
+}
+
+/* Hover effect for stock button */
+.stock_button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+    color: white;  /* Text color on hover */
+    border: none; /* Remove any border interference */
+}
+
+/* Star button hover effect */
+.star-button:hover {
+    background-color: #3e3e50;  /* Background color on hover */
+}
+
+.stock_button.selected:hover {
+    background-color: #292936; /* Your custom hover color while clicked */
+}
+
+/* Make sure all borders are removed when selected */
+.stock_button, .star-button {
+    outline: none;
+    box-shadow: none;  /* Removes any shadow effect */
+}
+.stock_button, .star-button {
+    transition: background-color 0.3s ease, color 0.3s ease; /* You can adjust the time and effect */
+}
+
+.stock-name {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.stock-pricing {
+    text-align: right;
+    padding-right: 8px; 
+}
+
+.stock-price {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.price-change {
+    font-size: 14px
+}
+
+.stock-details {
+    padding-right: 5px;
+}
+
+.watchlist-card, .search-bar, .btn {
+    border-radius: 10px; /* Smooth rounded corners */
+}
+.watchlist-card, .search-bar, .btn {
+    border-radius: 10px; /* Smooth rounded corners */
+}
+.watchlist-item-container:last-child {
+    border-bottom-left-radius: 6px !important;  /* Match the container's rounding */
+    border-bottom-right-radius: 6px !important; /* Match the container's rounding */
+    overflow: hidden !important; /* Prevent overflow beyond the container */
+}

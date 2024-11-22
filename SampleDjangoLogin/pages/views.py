@@ -78,6 +78,8 @@ def home(request):
     page = request.GET.get('page')
     notifications_paginated = paginator.get_page(page)
 
+    watchlist_data = get_watchlist(request)
+
     context = {
         'markets': portfolio_data,
         'time': current_time,
@@ -85,7 +87,9 @@ def home(request):
         'notifications': notifications_paginated,
         'notif_count': notifications.count(),
         'top_notif': notifications_paginated,
+        'watchlist': watchlist_data
     }
+    
 
     return render(request, "pages/home.html", context)
 
@@ -114,10 +118,13 @@ def notifications(request, notification_id=None):
         detailed_notifications = None
         selected_notification_id = None
 
+    watchlist_data = get_watchlist(request)
+
     context = {
         'notifications': notifications_paginated,
         'detailed_notifications': detailed_notifications,
         'selected_notification_id': selected_notification_id,
+        'watchlist': watchlist_data
     }
 
     return render(request, "pages/notifications.html", context)
@@ -283,6 +290,8 @@ def stock_details(request, symbol, time_frame='1mo'):
         }
     )
 
+    watchlist_data = get_watchlist(request)
+
     # Prepare context data to pass to the template
     context = {
         'stock': {
@@ -294,13 +303,13 @@ def stock_details(request, symbol, time_frame='1mo'):
         'time_frame': time_frame,
         'dates': json.dumps(dates),
         'closing_prices': json.dumps(closing_prices),
+        'watchlist': watchlist_data
     }
 
     # Return the rendered response
     return render(request, 'pages/stock_details.html', context)
 
 
-@login_required
 def user_watchlist(request):
     user_watchlist = Watchlist.objects.filter(user=request.user)
     stock_data = []
@@ -416,3 +425,26 @@ def add_watchlist(request):
         
         # Redirect back to the stock details page or wherever you want
         return redirect('stock_details', symbol=stock_symbol)
+
+def get_watchlist(request):
+    user_watchlist = Watchlist.objects.filter(user=request.user)
+    stock_data = []
+
+    for entry in user_watchlist:
+        stock_symbol = entry.stock.symbol
+        stock_info = yf.Ticker(stock_symbol)
+        
+        current_price = round(stock_info.history(period="1d")['Close'].iloc[0], 2)
+        prev_close = stock_info.info['previousClose']
+        percent_change = round(((current_price - prev_close) / prev_close) * 100, 2)
+        price_change_direction = 'up' if percent_change > 0 else 'down'
+
+        stock_data.append({
+            'symbol': stock_symbol,
+            'company_name': entry.stock.company_name,
+            'current_price': current_price,
+            'percent_change': percent_change,
+            'change_direction': price_change_direction
+        })
+    
+    return stock_data

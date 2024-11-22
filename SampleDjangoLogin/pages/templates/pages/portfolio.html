@@ -54,46 +54,6 @@
     </div>
 
     <div class="float-end">
-        <div class="watchlist-container">
-            <div class="watchlist-card">
-                <div class="card-header">
-                    <h4 class="Watchlist_Header">Watchlist</h4>
-                </div>
-                {% if watchlist %}
-                    <ul class="list-unstyled">
-                        {% for stock in watchlist %}
-                            <div class="watchlist-item-container d-flex align-items-center">
-                                <!-- Left: Star Icon (watchlist toggle) -->
-                                <button type="button" class="star-button" data-stock-symbol="{{ stock.symbol }}">
-                                    <span class="star-icon {% if stock.symbol in watchlist %}active{% endif %}">&#9733;</span>
-                                </button>
-                                  
-                                <!-- Right: Stock Button (stock details) -->
-                                <button type="button" class="btn stock_button flex-grow-1" data-url="/stock/{{ stock.symbol | lower }}/">
-                                    <div class="watchlist-item d-flex justify-content-between align-items-center">
-                                        <!-- Stock Symbol and Name -->
-                                        <div class="stock-details">
-                                            <span class="stock-name">{{ stock.symbol | upper }}</span>
-                                        </div>
-
-                                        <!-- Stock Price and Percentage Change -->
-                                        <div class="stock-pricing text-end">
-                                            <div class="stock-price">${{ stock.current_price }}</div>
-                                            <div class="price-change {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
-                                                {{ stock.percent_change }}%
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>You have no stocks in your watchlist.</p>
-                {% endif %}
-            </div>
-        </div>
-
         <!-- Insert Pie Chart Here -->
         <div class="pie-chart-container" style="width: 100%; height: 400px;">
             <canvas id="sectorPieChart"></canvas>
