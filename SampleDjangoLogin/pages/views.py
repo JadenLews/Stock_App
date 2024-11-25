@@ -174,7 +174,6 @@ def portfolio(request):
 
             # Get the current UTC time
             current_time = timezone.now()
-            print(entry.stock.symbol)
 
             for notif in stock_notifs:
                 # Check if created_at and current_time are on the same date
@@ -196,7 +195,6 @@ def portfolio(request):
 
             # Get the current UTC time
             current_time = timezone.now()
-            print(entry.stock.symbol)
 
             for notif in stock_notifs:
                 # Check if created_at and current_time are on the same date
@@ -259,10 +257,8 @@ def stock_details(request, symbol, time_frame='1mo'):
     # Check if the stock data is cached
     stock_data_cache_key = f"stock_data_{symbol}_{time_frame}"
     stock_info = cache.get(stock_data_cache_key)
-    print(stock_info)
     
     if stock_info is None or stock_info.empty:
-        print("You Made It Here!")
         # Fetch the stock data if it's not cached or if the cached data is empty
         stock_info = stock.history(period=time_frame, interval=interval)
         
@@ -345,7 +341,6 @@ def toggle_watchlist(request, symbol):
 
     if request.method == 'POST':
         action = json.loads(request.body).get('action')
-        print(action)
         if action == 'add':
             Watchlist.objects.get_or_create(stock=stock, user=user)
         elif action == 'remove':

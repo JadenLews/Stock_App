@@ -306,6 +306,71 @@ body, html {
 </div>
 </div>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle stock button selection and navigation
+        document.querySelectorAll('.stock_button').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    window.location.href = url;  // Redirect to the dynamically constructed URL
+                }
+
+                // Optional: Handle button selection styling
+                document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
+                document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
+
+                this.classList.add('selected');
+                this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+            });
+        });
+
+        // Handle watchlist star button click
+        document.querySelectorAll('.star-button').forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevent stock button click
+
+                const stockSymbol = this.getAttribute('data-stock-symbol');
+                const starIcon = this.querySelector('.star-icon');
+                const watchlistItemContainer = this.closest('.watchlist-item-container');
+                const isActive = starIcon.classList.contains('active');
+
+                // Send the correct action (add or remove) based on the current state
+                const action = isActive ? 'remove' : 'add';
+
+                // AJAX call to toggle watchlist status
+                fetch(`/watchlist/toggle/${stockSymbol}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',  // CSRF token from Django template
+                    },
+                    body: JSON.stringify({ action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Toggle the star icon's active state
+                        starIcon.classList.toggle('active');
+
+                        // If removing, also remove the item from the DOM
+                        if (action === 'remove') {
+                            watchlistItemContainer.remove(); // Remove the stock from the DOM
+                        }
+                    } else {
+                        console.error('Failed to update watchlist:', data);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error during AJAX request:', err);
+                });
+            });
+        });
+    });
+</script>
+
+
+
+<script>
     function openNotifBar() {
         document.getElementById("notifBar").style.display = "block";
     }

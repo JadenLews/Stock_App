@@ -1,141 +1,19 @@
-.search_results {
-    margin: 20px;
-    flex-basis: 300px; /* Fixed width for the card */
-    flex-shrink: 0;  /* Prevents the card from shrinking */
-    max-width: 300px; /* Ensures it doesn't exceed 300px */
+@media (max-width: 768px) {
+    .flexme {
+        flex-direction: column;
+    }
 }
-.backyground {
-    background-color: #1c1c28;
-}
-.total_price, .stock_symbol {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+.stockchart {
+    margin: 15px;
 }
 
-.card-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 2px solid #ccc !important;
+.time_button {
+    margin: 10px;
+    padding: 10px 20px !important;
 }
-
-body, html {
-    margin: 0;
-    padding: 0;
+.addwl_button {
+    margin: 10px;
+    padding: 10px 20px !important;
+    background-color: rgb(30, 42, 42) !important;
+    float: left !important;
 }
-
-.buysell_Header, .stockdisplay2 {
-    color: #ffffff;
-}
-.cardtop {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 24px;
-    color: #ffffff;
-    text-align: center;
-    font-weight: 600;
-}
-
-.card {
-    background-color: #3e3e50 !important;
-    margin: 0 auto;
-}
-
-.card-body {
-    padding: 0 !important;
-}
-
-.quantity input {
-    width: 80px;
-    transition: width 0.2s ease;
-    min-width: 80px;
-}
-
-.form-label, .labelcurrent {
-    color: #ffffff !important;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.stock-display {
-    font-size: 18px;
-    font-weight: 600;
-}
-.stockticker {
-    color: #ffffff;
-}
-
-.total_price input {
-    min-width: 150px;
-    width: 150px;
-    text-align: center;
-}
-
-.buy_sell {
-    max-width: 400px;
-    background-color: #3e3e50 !important;
-}
-
-.action-item {
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: all 0.3s ease;
-}
-
-.action-item.buy {
-    color: green;
-}
-
-.action-item.sell {
-    color: red;
-}
-
-.active-action {
-    font-size: 1.5rem;
-    font-weight: bold;
-    transform: scale(1.1);
-}
-
-.custom-btn {
-    width: 150px;
-    background-color: green;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    margin: 15px auto;
-    cursor: pointer;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 400;
-    text-align: center;
-    display: block;
-}
-
-.addtowatch {
-    width: 75px;
-    background-color: #1c1c28;
-    color: white;
-    border: none;
-    margin-right: 10px !important;
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 5px;
-    margin: 15px auto;
-    cursor: pointer;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 400;
-    text-align: center;
-}
-
-.custom-btn:hover {
-    background-color: #45a049;
-}
-
-/* Container layout */
-.content-container {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start; /* Align items at the top */
-}
-
