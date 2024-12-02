@@ -17,7 +17,13 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
+
+def custom_logout(request):
+    logout(request)
+    print("User logged out")
+    return redirect('login')
 
 
 def register(request):
@@ -193,11 +199,12 @@ def portfolio(request):
             'current_price': current_price,
             'percent_change': percent_change,
             'change_direction': price_change_direction
-        })
+        })  
     
     portfolio_stocks = Portfolio.objects.filter(user=request.user)
     portfolio_data = []
     sector_count = {}
+    sector_price = {}
     
 
     for entry in portfolio_stocks:
@@ -255,8 +262,11 @@ def portfolio(request):
         
         if sector in sector_count:
             sector_count[sector] += 1 * int(stock_quantity)
+            sector_price[sector] += float(stock_quantity) * float(current_price)
         else:
             sector_count[sector] = 1 * int(stock_quantity)
+            sector_price[sector] = float(stock_quantity) * float(current_price)
+            
         
 
         portfolio_data.append({
@@ -280,7 +290,8 @@ def portfolio(request):
         'markets': portfolio_data,
         'time': current_time,
         'date': current_date,
-        'sector_count': sector_count
+        'sector_count': sector_count,
+        'sector_price': sector_price
     }
     
     return render(request, "pages/portfolio.html", context)
