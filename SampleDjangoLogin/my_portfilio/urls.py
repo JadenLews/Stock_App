@@ -24,7 +24,7 @@ urlpatterns = [
     path("pages/", include("pages.urls")),
     path('register/', user_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='pages/logout.html',http_method_names = ['get', 'post', 'options']), name='logout'),
+    path('logout/', user_views.custom_logout, name='logout'),
     path("home/", user_views.home, name='home'),
     path("portfolio/", user_views.portfolio, name='portfolio'),
     path('watchlist/', user_views.user_watchlist, name='user_watchlist'),

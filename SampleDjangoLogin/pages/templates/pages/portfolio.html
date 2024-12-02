@@ -58,6 +58,10 @@
         <div class="pie-chart-container" style="width: 100%; height: 400px;">
             <canvas id="sectorPieChart"></canvas>
         </div>
+        <div class="pie-chart-container" style="width: 100%; height: 400px;">
+            <canvas id="sectorPricePieChart"></canvas>
+        </div>
+
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
@@ -98,6 +102,57 @@
                                     callbacks: {
                                         label: function(tooltipItem) {
                                             return tooltipItem.label + ': ' + tooltipItem.raw + ' stocks';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Invalid sectorCount data or no data available');
+                }
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Debugging: Log the sectorCount data to the console
+                const sectorPrice = {{ sector_price | safe }};
+                console.log('Sector Price:', sectorPrice); // Check the sector_count dictionary
+
+                // Ensure the canvas element is correctly loaded
+                const ctx = document.getElementById('sectorPricePieChart');
+                console.log('Canvas Element:', ctx);  // Check if the canvas is correctly selected
+
+                // Check if sectorCount is valid
+                if (sectorPrice && Object.keys(sectorPrice).length > 0) {
+                    const sectorLabels = Object.keys(sectorPrice); 
+                    console.log('Keys', sectorLabels); // Sector names
+                    const sectorValues = Object.values(sectorPrice);
+                    console.log('Values', sectorValues);  // Quantities
+
+                    const sectorPricePieChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: sectorLabels,
+                            datasets: [{
+                                label: 'Stock Sector Distribution by Price',
+                                data: sectorValues,
+                                backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF9633'],  // Customize colors
+                                borderColor: '#ffffff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            return tooltipItem.label + ': $' + tooltipItem.raw;
                                         }
                                     }
                                 }
