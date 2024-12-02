@@ -33,6 +33,48 @@ def register(request):
     context = {'form': form}
     return render(request, 'pages/register.html', context)
 
+def get_portfolio_historical_values(request, time_frame):
+    portfolio_stocks = Portfolio.objects.filter(user=request.user)
+    interval = "1d"
+
+    if time_frame == "1d":
+        interval = "15m"
+    elif time_frame == "5d":
+        interval = "30m"
+
+    portfolio_values = []
+    dates = None
+
+    for entry in portfolio_stocks:
+        stock_symbol = entry.stock.symbol
+        num_shares = float(entry.num_shares)  # Convert Decimal to float
+
+        cache_key = f"historical_stock_data_{stock_symbol}_{time_frame}_{interval}"
+        stock_data = cache.get(cache_key)
+
+        if not stock_data:
+            try:
+                stock = yf.Ticker(stock_symbol)
+                stock_data = stock.history(period=time_frame, interval=interval)
+                cache.set(cache_key, stock_data, timeout=600)
+            except Exception as e:
+                print(f"Error fetching data for {stock_symbol}: {e}")
+                continue
+
+        closing_prices = stock_data['Close'].tolist()
+        if dates is None:
+            dates = stock_data.index.strftime("%Y-%m-%d %H:%M").tolist() if interval != "1d" else stock_data.index.strftime("%Y-%m-%d").tolist()
+
+        if not portfolio_values:
+            portfolio_values = [price * num_shares for price in closing_prices]
+        else:
+            portfolio_values = [sum(x) for x in zip(portfolio_values, [price * num_shares for price in closing_prices])]
+
+    return {
+        "dates": dates or [],
+        "portfolio_values": portfolio_values or []
+    }
+
 
 @login_required
 def home(request):
@@ -79,6 +121,7 @@ def home(request):
     notifications_paginated = paginator.get_page(page)
 
     watchlist_data = get_watchlist(request)
+    
 
     context = {
         'markets': portfolio_data,
