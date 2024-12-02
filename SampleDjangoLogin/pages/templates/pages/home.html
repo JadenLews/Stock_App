@@ -1,109 +1,292 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block page_content %} {% load static %}
+<link rel="stylesheet" href="{% static 'css/stock_details.css' %}" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{% block page_content %}
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
-<div class="homewholepage">
+<div class="container-fluid">
     {% if user.is_authenticated %}
+    <!-- Welcome Section -->
     <div class="welcome" role="alert">
-        <h3 class="welcome_text">Welcome {{ user.first_name }}!</h3>
-        <a class="welcome_text" href="{% url 'logout' %}">Logout</a>
+      <h3 class="welcome_text">Welcome {{ user.email }}!</h3>
+      <a class="welcome_text" href="{% url 'logout' %}">Logout</a>
     </div>
     <div class="turn-white">
-        <h5>Updated: {{ time }} ET, {{ date }} 
-            <a href="{% url 'home' %}"> 
-                <button>↻</button>
-            </a>
-        </h5>
+      <h5>
+        Updated: {{ time }} ET, {{ date }}
+        <a href="{% url 'home' %}">
+          <button>↻</button>
+        </a>
+      </h5>
     </div>
-    <div class="markets-container">
-        <div class="markets-card">
-            <div class="card-header">
-                <h4 class="Markets_Header">Markets</h4>
+  
+    <!-- Main Content -->
+    <div class="row">
+      <!-- Portfolio Value Section -->
+      <div class="col-lg-9 col-md-12 mb-4">
+        <div class="bg-dark text-white rounded stockchart p-4">
+          <div class="wompwomp d-flex flex-column">
+            <!-- Timeframe Buttons -->
+            <div class="d-flex flex-wrap justify-content-center mb-3">
+                {% for frame in time_frames %}
+                <button
+                    class="time_button p-2 timeframe-btn {% if time_frame == frame %}selected{% endif %}"
+                    onclick="window.location.href = '{% url 'home' frame %}'"
+                >
+                    {{ frame|upper }}
+                </button>
+                {% endfor %}
             </div>
+  
+            <!-- Chart Container -->
+            <div class="chart-container w-100">
+              {% if error %}
+              <div class="alert alert-danger" role="alert">{{ error }}</div>
+              {% else %}
+              <canvas id="portfolioChart" width="100%" height="400"></canvas>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Market Watchlist Section -->
+      <div class="col-lg-3 col-md-12">
+        <div class="bg-dark text-white rounded p-4 shadow">
+          <div class="text-center mb-3">
+            <h4>Market Watchlist</h4>
+          </div>
+          <div>
             {% if markets %}
-                <ul class="list-unstyled">
-                    {% for stock in markets %}
-                        <div class="markets-item-container d-flex align-items-center">
-                            <button type="button" class="btn stock_button flex-grow-1">
-                                <div class="markets-item d-flex justify-content-between align-items-center">
-                                    <div class="stock-pricing text-end">
-                                        <div class="stock-name">
-                                            <span class="marketstock-name">{{ stock.symbol |upper }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="stock-pricing text-end">
-                                        <div class="stock-price">${{ stock.current_price }}</div>
-                                        <div class="price-change {% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}">
-                                            {{ stock.percent_change }}%
-                                        </div>
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    {% endfor %}
-                </ul>
+            <ul class="list-group">
+              {% for stock in markets %}
+              <li
+                class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
+              >
+                <!-- Stock Symbol and Price -->
+                <div>
+                  <strong>{{ stock.symbol|upper }}</strong>
+                  <small class="text-muted d-block">{{ stock.company_name }}</small>
+                </div>
+                <div class="text-end">
+                  <span class="fw-bold">${{ stock.current_price }}</span>
+                  <span
+                    class="{% if stock.change_direction == 'up' %}text-success{% else %}text-danger{% endif %}"
+                  >
+                    {{ stock.percent_change }}%
+                  </span>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
             {% else %}
-                <p>You have no stocks in your markets.</p>
+            <p class="text-center">You have no stocks in your watchlist.</p>
             {% endif %}
+          </div>
         </div>
-    </div> <!-- End of markets-container -->
-    <div class="notif-container">
-        <div class="notif-card">
-            <div class="card-header">
-                <h4 class="Notif_Header">Quick Notifications</h4>
-            </div>
-            <div class="card-header">
-                <h2 class="Notif_Header notification-count-text">
-                    {% if notif_count == 1 %}
-                        You have 1 Unviewed Notification.<br>
-                        Here is the Most Recent.<br>
-                    {% elif notif_count > 1 %}
-                        You have {{ notif_count }} Unviewed Notifications.<br>
-                        Here are the Most Recent.<br>
-                    {% else %}
-                        You have 0 Unviewed Notifications.
-                    {% endif %}
-                </h2>
-            </div>
-            {% if top_notif %}
-                <ul class="list-unstyled">
-                    {% for notif in top_notif %}
-                        <div class="notif-item-container d-flex flex-column align-items-start">
-                            <div class="markets-item d-flex flex-column align-items-start">
-                                <span class="notifstock-name">
-                                    {{ notif.stock.company_name | upper }} ({{ notif.stock.symbol | upper }})
-                                </span>
-                                <div class="notif-text">
-                                    <span class="notif-info">
-                                        {% if notif.message|length > 100 %}
-                                            {{ notif.message|slice:":100" }}...
-                                        {% else %}
-                                            {{ notif.message }}
-                                        {% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </ul>
-            {% else %}
-            {% endif %}
-        </div>
-    </div> <!-- End of markets-container -->
+      </div>
+    </div>
     {% else %}
-    <div class="alert alert-success" role="alert">
-        <a href="{% url 'register' %}">Signup</a>
-        <a href="{% url 'login' %}">Login</a>
+    <div class="alert alert-success text-center" role="alert">
+      <a href="{% url 'register' %}" class="btn btn-success me-2">Signup</a>
+      <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
     </div>
     {% endif %}
-</div>
+  </div>
+
+<!-- Portfolio Chart Script -->
+<script>
+  const chartLabels = {{ portvalue.dates|safe }};
+const chartData = {{ portvalue.portfolio_values|safe }};
+
+const ctx = document.getElementById('portfolioChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: chartLabels,
+        datasets: [{
+            label: 'Portfolio Value (USD)',
+            data: chartData,
+            borderColor: 'rgba(0, 136, 255, 0.8)', // Line color
+            backgroundColor: 'rgba(0, 136, 255, 0.1)', // Area under the line
+            fill: true, // Fills the area under the line
+            tension: 0.1, // Smoothens the line (set to 0 for sharp corners)
+            borderWidth: 2, // Width of the line
+            pointRadius: 0, // Removes point markers for a cleaner look
+            pointHoverRadius: 3, // Adds hover effect to points
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date',
+                    color: '#cccccc'
+                },
+                ticks: { color: '#cccccc' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Value (USD)',
+                    color: '#cccccc'
+                },
+                ticks: { color: '#cccccc' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#cccccc',
+                    font: { size: 14 }
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false, // Allows for better hover interaction
+            }
+        },
+        elements: {
+            line: {
+                tension: 0.1, // Adjust this value for smoother or sharper lines
+            }
+        }
+    }
+});
+</script>
+
+<!-- CSS Styles -->
+<style>
+  /* Adjusting card elements */
+  .card {
+    border: none;
+    margin-bottom: 20px;
+  }
+
+  .list-group-item {
+    border: none;
+  }
+
+  .text-muted {
+    font-size: 0.85rem;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .col-lg-9,
+    .col-lg-3 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    canvas {
+      height: 300px !important;
+    }
+  }
+  .welcome_text {
+    color: aliceblue;
+    text-align: center;
+  }
+  .button-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 25px;
+    margin-left: 45px;
+    margin-top: 20px;
+    height: auto; /* Allow height to be dynamic based on content */
+    box-sizing: border-box;
+  }
+
+  /* Styling for each button */
+  .timeframe-btn {
+    padding: 8px 18px;
+    background-color: #4c4c61;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  .timeframe-btn:hover {
+    background-color: #4a4a5c;
+    color: #00ff00;
+    transform: scale(1.05);
+  }
+
+  .timeframe-btn.selected {
+    outline: none;
+    box-shadow: 0 0 5px #00ff00;
+    background-color: #282c34; /* Example background for the selected button */
+    color: #00ff00; /* Optional: Change text color for selected */
+  }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle stock button selection and navigation
+        document.querySelectorAll('.stock_button').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    window.location.href = url;  // Redirect to the dynamically constructed URL
+                }
+
+                // Optional: Handle button selection styling
+                document.querySelectorAll('.stock_button').forEach(btn => btn.classList.remove('selected'));
+                document.querySelectorAll('.star-button').forEach(star => star.classList.remove('selected'));
+
+                this.classList.add('selected');
+                this.previousElementSibling.classList.add('selected'); // Targets the previous sibling, which is the star-button
+            });
+        });
+
+        // Handle watchlist star button click
+        document.querySelectorAll('.star-button').forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevent stock button click
+
+                const stockSymbol = this.getAttribute('data-stock-symbol');
+                const starIcon = this.querySelector('.star-icon');
+                const watchlistItemContainer = this.closest('.watchlist-item-container');
+                const isActive = starIcon.classList.contains('active');
+
+                // Send the correct action (add or remove) based on the current state
+                const action = isActive ? 'remove' : 'add';
+
+                // AJAX call to toggle watchlist status
+                fetch(`/watchlist/toggle/${stockSymbol}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',  // CSRF token from Django template
+                    },
+                    body: JSON.stringify({ action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Toggle the star icon's active state
+                        starIcon.classList.toggle('active');
+
+                        // If removing, also remove the item from the DOM
+                        if (action === 'remove') {
+                            watchlistItemContainer.remove(); // Remove the stock from the DOM
+                        }
+                    } else {
+                        console.error('Failed to update watchlist:', data);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error during AJAX request:', err);
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}
-
-
-
-
-
-

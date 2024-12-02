@@ -39,43 +39,55 @@ def register(request):
     context = {'form': form}
     return render(request, 'pages/register.html', context)
 
-def get_portfolio_historical_values(request, time_frame):
+def get_portfolio_historical_values(request, time_frame='1mo'):
+    # Initialize the portfolio and result variables
     portfolio_stocks = Portfolio.objects.filter(user=request.user)
     interval = "1d"
-
     if time_frame == "1d":
         interval = "15m"
     elif time_frame == "5d":
         interval = "30m"
 
+    # Create a dictionary to store the portfolio values
     portfolio_values = []
-    dates = None
+    dates = None  # To store the date range
 
+    # Iterate through each stock in the user's portfolio
     for entry in portfolio_stocks:
         stock_symbol = entry.stock.symbol
-        num_shares = float(entry.num_shares)  # Convert Decimal to float
+        num_shares = float(entry.num_shares)  # Convert Decimal to float for calculations
 
-        cache_key = f"historical_stock_data_{stock_symbol}_{time_frame}_{interval}"
-        stock_data = cache.get(cache_key)
+        # Check if stock data is cached
+        stock_data_cache_key = f"portfolio_stock_data_{stock_symbol}_{time_frame}"
+        stock_info = cache.get(stock_data_cache_key)
 
-        if not stock_data:
-            try:
-                stock = yf.Ticker(stock_symbol)
-                stock_data = stock.history(period=time_frame, interval=interval)
-                cache.set(cache_key, stock_data, timeout=600)
-            except Exception as e:
-                print(f"Error fetching data for {stock_symbol}: {e}")
+        if stock_info is None or stock_info.empty:
+            # Fetch historical data using yfinance
+            stock = yf.Ticker(stock_symbol)
+            stock_info = stock.history(period=time_frame, interval=interval)
+
+            # Handle case where no data is available
+            if stock_info.empty:
                 continue
 
-        closing_prices = stock_data['Close'].tolist()
+            # Cache the stock data for 10 minutes
+            cache.set(stock_data_cache_key, stock_info, timeout=600)
+
+        # Extract closing prices and calculate the total value for this stock
+        closing_prices = stock_info['Close'].tolist()
         if dates is None:
-            dates = stock_data.index.strftime("%Y-%m-%d %H:%M").tolist() if interval != "1d" else stock_data.index.strftime("%Y-%m-%d").tolist()
+            # Set the dates only once, as all stocks should have the same time points
+            dates = stock_info.index.strftime("%Y-%m-%d %H:%M").tolist() if interval != "1d" else stock_info.index.strftime("%Y-%m-%d").tolist()
 
+        stock_values = [price * num_shares for price in closing_prices]
+
+        # Add the stock values to the portfolio values
         if not portfolio_values:
-            portfolio_values = [price * num_shares for price in closing_prices]
+            portfolio_values = stock_values
         else:
-            portfolio_values = [sum(x) for x in zip(portfolio_values, [price * num_shares for price in closing_prices])]
+            portfolio_values = [sum(x) for x in zip(portfolio_values, stock_values)]
 
+    # Return the dates and portfolio values
     return {
         "dates": dates or [],
         "portfolio_values": portfolio_values or []
@@ -83,7 +95,7 @@ def get_portfolio_historical_values(request, time_frame):
 
 
 @login_required
-def home(request):
+def home(request, time_frame='1mo'):
     eastern = pytz.timezone('US/Eastern')
     current_time = datetime.now(eastern).strftime("%I:%M:%S %p")
     current_date = datetime.now(eastern).strftime("%m/%d/%Y")
@@ -127,6 +139,9 @@ def home(request):
     notifications_paginated = paginator.get_page(page)
 
     watchlist_data = get_watchlist(request)
+    value = get_portfolio_historical_values(request, time_frame)
+
+    time_frames = ['1d', '5d', '1mo', '3mo', '6mo', '1y']
     
 
     context = {
@@ -136,7 +151,10 @@ def home(request):
         'notifications': notifications_paginated,
         'notif_count': notifications.count(),
         'top_notif': notifications_paginated,
-        'watchlist': watchlist_data
+        'watchlist': watchlist_data,
+        'portvalue': value,
+        'time_frame':time_frame,
+        'time_frames': time_frames,
     }
     
 

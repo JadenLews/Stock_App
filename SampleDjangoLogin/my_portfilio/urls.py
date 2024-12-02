@@ -26,6 +26,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
     path('logout/', user_views.custom_logout, name='logout'),
     path("home/", user_views.home, name='home'),
+    path("home/<str:time_frame>/", user_views.home, name='home'),
     path("portfolio/", user_views.portfolio, name='portfolio'),
     path('watchlist/', user_views.user_watchlist, name='user_watchlist'),
     path("notifications/", user_views.notifications, name='notifications'),
