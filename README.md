@@ -28,6 +28,6 @@ A web-based stock portfolio app built with **Django** and **Python**, allowing u
 
 ## Screenshots
 
-- `assets/figma.png` – Figma Portfolio dashboard  
-- `assets/watch.png` – User watchlist  
-- `assets/notifs.png` – Notifications screen
+![Figma Portfolio dashboard  ](assets/figma.png)
+![User watchlist  ](assets/watch.png)
+![Notifications screen](assets/notifs.png)
